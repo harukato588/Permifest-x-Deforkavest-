@@ -24,7 +24,7 @@ export function createAdminClient(): SupabaseClient {
   if (!serviceRoleKey) {
     // Mode demo / fallback jika service role belum diisi di .env.local
     console.warn(
-      '[Supabase Admin] Peringatan: SUPABASE_SERVICE_ROLE_KEY belum disetel di .env.local. Fitur signed storage URL akan berjalan dalam mode simulasi.'
+      ''
     );
   }
 
