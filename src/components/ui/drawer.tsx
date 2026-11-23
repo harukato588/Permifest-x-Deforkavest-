@@ -71,10 +71,10 @@ export function Drawer({
           if (e.target === e.currentTarget) onClose();
         }}
       >
-        <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10">
+        <div className="fixed inset-y-0 right-0 max-w-full flex pl-4 sm:pl-8 pointer-events-none">
           <div
             className={cn(
-              'w-screen bg-[var(--card)] border-l border-[var(--border)] shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out animate-in slide-in-from-right',
+              'w-screen h-full max-h-[100dvh] pointer-events-auto bg-[var(--card)] border-l border-[var(--border)] shadow-2xl flex flex-col overflow-hidden min-h-0 transform transition-transform duration-300 ease-in-out animate-in slide-in-from-right',
               sizes[size],
               className
             )}
@@ -168,7 +168,12 @@ export function DrawerContent({
   children: React.ReactNode;
 }) {
   return (
-    <div className={cn('p-5 overflow-y-auto flex-1 space-y-4 text-sm text-[var(--foreground)]', className)}>
+    <div
+      className={cn(
+        'p-5 sm:p-6 overflow-y-auto flex-1 min-h-0 space-y-4 text-sm text-[var(--foreground)] overscroll-contain',
+        className
+      )}
+    >
       {children}
     </div>
   );
@@ -184,7 +189,7 @@ export function DrawerFooter({
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center justify-end gap-3 p-4 border-t border-[var(--border)] bg-[var(--accent)]/30 shrink-0',
+        'flex flex-wrap items-center justify-end gap-3 p-4 sm:p-5 border-t border-[var(--border)] bg-[var(--card)] shrink-0 mt-auto',
         className
       )}
     >

@@ -549,8 +549,8 @@ export default function AdminGuidebookPage() {
           description="Pastikan berkas PDF memiliki teks yang jelas dan rubrik penilaian mutakhir."
           size="lg"
         >
-          <form onSubmit={handleSubmit} className="flex-1 flex flex-col justify-between">
-            <DrawerContent className="space-y-4">
+          <form onSubmit={handleSubmit} className="flex-1 min-h-0 flex flex-col justify-between overflow-hidden">
+            <DrawerContent className="space-y-5 p-5 sm:p-6 overflow-y-auto">
               {drawerError && (
                 <Alert variant="destructive">
                   <AlertTitle>Kesalahan Formulir</AlertTitle>
@@ -558,59 +558,72 @@ export default function AdminGuidebookPage() {
                 </Alert>
               )}
 
-              {/* Judul Guidebook */}
-              <div>
-                <label className="block text-xs font-bold text-foreground mb-1.5">
-                  Judul Dokumen Guidebook <span className="text-destructive">*</span>
-                </label>
-                <Input
-                  required
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="misal: Buku Panduan Teknis Umum Permifest x Deforkafest 2026"
-                />
-              </div>
-
-              {/* Baris 2: Kategori & Versi */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-foreground mb-1.5">
-                    Kategori / Cabang Lomba <span className="text-destructive">*</span>
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value as GuidebookCategory })}
-                    className="w-full px-3 py-2 rounded-xl text-xs bg-background border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                  >
-                    <option value="general">Panduan Umum Perlombaan</option>
-                    <option value="esai">Esai Ilmiah: Cyber Security</option>
-                    <option value="uiux">UI/UX Design Competition</option>
-                    <option value="it_system_arch">IT System Architecture</option>
-                    <option value="pes">PES 2026 e-Football</option>
-                    <option value="ml">Mobile Legends: Bang Bang</option>
-                  </select>
+              {/* Bagian 1: Informasi Dokumen */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border shadow-xs space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b border-border/70">
+                  <span className="w-2 h-2 rounded-full bg-primary" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
+                    1. Identitas Buku Panduan
+                  </h4>
                 </div>
 
+                {/* Judul Guidebook */}
                 <div>
                   <label className="block text-xs font-bold text-foreground mb-1.5">
-                    Nomor Versi Dokumen <span className="text-destructive">*</span>
+                    Judul Dokumen Guidebook <span className="text-destructive">*</span>
                   </label>
                   <Input
                     required
-                    value={formData.version}
-                    onChange={(e) => setFormData({ ...formData, version: e.target.value })}
-                    placeholder="misal: v2.1"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="misal: Buku Panduan Teknis Umum Permifest x Deforkafest 2026"
                   />
+                </div>
+
+                {/* Baris 2: Kategori & Versi */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-xs font-bold text-foreground mb-1.5">
+                      Kategori / Cabang Lomba <span className="text-destructive">*</span>
+                    </label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value as GuidebookCategory })}
+                      className="w-full px-3 py-2 rounded-xl text-xs bg-background border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary h-9"
+                    >
+                      <option value="general">Panduan Umum Perlombaan</option>
+                      <option value="esai">Esai Ilmiah: Cyber Security</option>
+                      <option value="uiux">UI/UX Design Competition</option>
+                      <option value="it_system_arch">IT System Architecture</option>
+                      <option value="pes">PES 2026 e-Football</option>
+                      <option value="ml">Mobile Legends: Bang Bang</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-foreground mb-1.5">
+                      Nomor Versi Dokumen <span className="text-destructive">*</span>
+                    </label>
+                    <Input
+                      required
+                      value={formData.version}
+                      onChange={(e) => setFormData({ ...formData, version: e.target.value })}
+                      placeholder="misal: v2.1"
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Mode Input File: Upload vs URL */}
-              <div className="p-3.5 rounded-2xl bg-background border border-border space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-foreground">
-                    Sumber Berkas PDF <span className="text-destructive">*</span>
-                  </label>
-                  <div className="flex items-center gap-1 bg-card p-0.5 rounded-lg border border-border text-xs">
+              {/* Bagian 2: Sumber Berkas PDF */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border shadow-xs space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-border/70">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-sky-500" />
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
+                      2. Berkas Dokumen PDF
+                    </h4>
+                  </div>
+                  <div className="flex items-center gap-1 bg-muted/60 p-0.5 rounded-lg border border-border text-xs">
                     <button
                       type="button"
                       onClick={() => setFileInputMode('upload')}
@@ -620,7 +633,7 @@ export default function AdminGuidebookPage() {
                         }`}
                     >
                       <UploadSimple size={12} weight="bold" />
-                      Unggah Berkas PDF
+                      Unggah File
                     </button>
                     <button
                       type="button"
@@ -631,7 +644,7 @@ export default function AdminGuidebookPage() {
                         }`}
                     >
                       <LinkSimple size={12} weight="bold" />
-                      Tautan URL Dokumen
+                      Tautan URL
                     </button>
                   </div>
                 </div>
@@ -648,7 +661,7 @@ export default function AdminGuidebookPage() {
                     />
                     <label
                       htmlFor="guidebook_pdf_file_input"
-                      className="p-5 border-2 border-dashed border-border hover:border-primary rounded-2xl bg-card/50 hover:bg-card flex flex-col items-center justify-center text-center cursor-pointer transition-colors group"
+                      className="p-5 border-2 border-dashed border-border hover:border-primary rounded-2xl bg-muted/20 hover:bg-muted/40 flex flex-col items-center justify-center text-center cursor-pointer transition-colors group"
                     >
                       <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-2 group-hover:scale-105 transition-transform">
                         <UploadSimple size={24} weight="bold" />
@@ -662,7 +675,7 @@ export default function AdminGuidebookPage() {
                     </label>
 
                     {formData.file_name && (
-                      <div className="p-3 rounded-xl bg-card border border-border flex items-center justify-between text-xs">
+                      <div className="p-3 rounded-xl bg-muted/40 border border-border flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2 truncate">
                           <FilePdf size={18} className="text-primary shrink-0" weight="fill" />
                           <span className="truncate text-foreground font-mono">{formData.file_name}</span>
@@ -674,7 +687,7 @@ export default function AdminGuidebookPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div>
                       <label className="block text-xs font-medium text-foreground mb-1">
                         Tautan URL Berkas PDF
@@ -701,49 +714,73 @@ export default function AdminGuidebookPage() {
                 )}
               </div>
 
-              {/* Deskripsi */}
-              <div>
-                <label className="block text-xs font-bold text-foreground mb-1.5">
-                  Ringkasan Isi Panduan
-                </label>
-                <textarea
-                  rows={3}
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Ringkasan poin penting mengenai buku panduan ini..."
-                  className="w-full px-3 py-2 rounded-xl text-xs bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                />
+              {/* Bagian 3: Ringkasan & Catatan */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border shadow-xs space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b border-border/70">
+                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
+                    3. Ringkasan &amp; Catatan Versi
+                  </h4>
+                </div>
+
+                {/* Deskripsi */}
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1.5">
+                    Ringkasan Isi Panduan
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Ringkasan poin penting mengenai buku panduan ini..."
+                    className="w-full px-3 py-2.5 rounded-xl text-xs bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary leading-relaxed"
+                  />
+                </div>
+
+                {/* Catatan Rilis */}
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1.5">
+                    Catatan Rilis / Perubahan (Opsional)
+                  </label>
+                  <Input
+                    value={formData.release_notes}
+                    onChange={(e) => setFormData({ ...formData, release_notes: e.target.value })}
+                    placeholder="misal: Pembaruan rubrik penilaian babak final dan penegasan format sitasi"
+                  />
+                </div>
               </div>
 
-              {/* Catatan Rilis */}
-              <div>
-                <label className="block text-xs font-bold text-foreground mb-1.5">
-                  Catatan Rilis / Perubahan (Opsional)
-                </label>
-                <Input
-                  value={formData.release_notes}
-                  onChange={(e) => setFormData({ ...formData, release_notes: e.target.value })}
-                  placeholder="misal: Pembaruan rubrik penilaian babak final dan penegasan format sitasi"
-                />
-              </div>
+              {/* Bagian 4: Status Publikasi */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border shadow-xs space-y-3">
+                <div className="flex items-center gap-2 pb-2 border-b border-border/70">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
+                    4. Status Publikasi
+                  </h4>
+                </div>
 
-              {/* Status Publikasi */}
-              <div className="flex items-center gap-3 pt-2">
-                <input
-                  type="checkbox"
-                  id="is_published"
-                  checked={formData.is_published}
-                  onChange={(e) => setFormData({ ...formData, is_published: e.target.checked })}
-                  className="w-4 h-4 rounded text-primary bg-background border-border focus:ring-primary"
-                />
-                <label htmlFor="is_published" className="text-xs text-foreground select-none cursor-pointer">
-                  <strong>Terbitkan langsung ke publik</strong> (dapat dibaca & diunduh oleh peserta)
+                <label className="flex items-start gap-3 p-3 rounded-xl bg-muted/40 border border-border cursor-pointer hover:bg-muted/60 transition-colors">
+                  <input
+                    type="checkbox"
+                    id="is_published"
+                    checked={formData.is_published}
+                    onChange={(e) => setFormData({ ...formData, is_published: e.target.checked })}
+                    className="w-4 h-4 rounded text-primary bg-background border-border focus:ring-primary mt-0.5"
+                  />
+                  <div className="text-xs select-none">
+                    <span className="font-bold text-foreground block">
+                      Terbitkan Langsung ke Publik
+                    </span>
+                    <span className="text-muted-foreground text-[11px]">
+                      Jika aktif, guidebook dapat dibaca online via viewer dan diunduh langsung oleh peserta
+                    </span>
+                  </div>
                 </label>
               </div>
             </DrawerContent>
 
             {/* Footer Drawer */}
-            <DrawerFooter className="p-6 border-t border-border flex flex-row items-center justify-end gap-3">
+            <DrawerFooter className="p-4 sm:p-5 border-t border-border flex flex-row items-center justify-end gap-3 bg-card shrink-0">
               <Button
                 type="button"
                 variant="outline"
