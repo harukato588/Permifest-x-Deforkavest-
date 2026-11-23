@@ -253,30 +253,32 @@ export function TimelineSection({ id = 'jadwal' }: TimelineSectionProps) {
         </div>
       </div>
 
-      {/* ── Filter Kategori Jadwal: Semua vs Lomba vs Seminar ── */}
-      <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 scrollbar-none select-none">
-        {[
-          { id: 'all', label: `Semua Acara (${lombaAgendaList.length + seminarAgendaList.length})` },
-          { id: 'lomba', label: `Tahapan Lomba (${lombaAgendaList.length})` },
-          { id: 'event', label: `Seminar & Workshop (${seminarAgendaList.length})` },
-        ].map((tab) => {
-          const isActive = categoryFilter === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setCategoryFilter(tab.id as 'all' | 'lomba' | 'event')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all min-h-[36px] border cursor-pointer shrink-0 ${
-                isActive
-                  ? 'bg-[#9B6BF2] text-[#0B0720] border-[#9B6BF2] shadow-[2px_2px_0px_#0B0720]'
-                  : 'bg-[#140D33] text-[#A99FD1] border-[#2E2266] hover:text-[#F5F2FF]'
-              }`}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
+      {/* ── Filter Kategori Jadwal: Hanya muncul jika ada agenda khusus / seminar ── */}
+      {seminarAgendaList.length > 0 && (
+        <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 scrollbar-none select-none">
+          {[
+            { id: 'all', label: `Semua Acara (${lombaAgendaList.length + seminarAgendaList.length})` },
+            { id: 'lomba', label: `Tahapan Lomba (${lombaAgendaList.length})` },
+            { id: 'event', label: `Seminar & Workshop (${seminarAgendaList.length})` },
+          ].map((tab) => {
+            const isActive = categoryFilter === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setCategoryFilter(tab.id as 'all' | 'lomba' | 'event')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all min-h-[36px] border cursor-pointer shrink-0 ${
+                  isActive
+                    ? 'bg-[#9B6BF2] text-[#0B0720] border-[#9B6BF2] shadow-[2px_2px_0px_#0B0720]'
+                    : 'bg-[#140D33] text-[#A99FD1] border-[#2E2266] hover:text-[#F5F2FF]'
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {viewMode === 'calendar' ? (
         <div className="rounded-2xl border border-[#2E2266] bg-[#140D33] p-4 sm:p-7 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">

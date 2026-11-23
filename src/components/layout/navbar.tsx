@@ -1,13 +1,20 @@
 
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { SakugaButton } from '@/components/ui/sakuga-button';
 import { CalendarBlank, Question, Trophy, BookOpen, CalendarStar } from '@phosphor-icons/react';
 
-const NAV_LINKS = [
+interface NavLinkItem {
+  href: string;
+  section: string;
+  label: string;
+  icon: React.ElementType;
+}
+
+const NAV_LINKS: NavLinkItem[] = [
   { href: '/#lomba', section: 'lomba', label: 'Lomba', icon: Trophy },
   { href: '/guidebook', section: 'guidebook', label: 'Guidebook', icon: BookOpen },
   { href: '/#jadwal', section: 'jadwal', label: 'Jadwal & Alur', icon: CalendarBlank },
@@ -16,12 +23,21 @@ const NAV_LINKS = [
 ];
 
 export function Navbar() {
-  const { currentUser } = useAppStore();
+  const { currentUser, events } = useAppStore();
   const [activeSection, setActiveSection] = useState('');
   const isLoggedIn = Boolean(currentUser && currentUser.email && currentUser.role);
 
+  const hasPublishedEvents = useMemo(() => {
+    return Array.isArray(events) && events.some((e) => e.is_published);
+  }, [events]);
+
+  const navLinks: NavLinkItem[] = useMemo(() => {
+    if (hasPublishedEvents) return NAV_LINKS;
+    return NAV_LINKS.filter((l) => l.section !== 'agenda');
+  }, [hasPublishedEvents]);
+
   useEffect(() => {
-    const sections = NAV_LINKS.map(({ section }) => document.getElementById(section)).filter(
+    const sections = navLinks.map(({ section }) => document.getElementById(section)).filter(
       (section): section is HTMLElement => section !== null
     );
 
@@ -40,7 +56,7 @@ export function Navbar() {
 
     sections.forEach((section) => observer.observe(section));
     return () => observer.disconnect();
-  }, []);
+  }, [navLinks]);
 
   return (
     <>
@@ -61,7 +77,7 @@ export function Navbar() {
             className="hidden md:flex items-center gap-1 select-none"
             aria-label="Navigasi utama"
           >
-            {NAV_LINKS.map((link) => {
+            {navLinks.map((link) => {
               const isActive = activeSection === link.section;
 
               return (
@@ -123,8 +139,8 @@ export function Navbar() {
         className="mobile-floating-nav fixed inset-x-3 z-50 mx-auto max-w-md rounded-full border border-border bg-background/75 p-2 shadow-md backdrop-blur-md md:hidden"
         aria-label="Navigasi bagian"
       >
-        <div className="grid grid-cols-4 gap-1">
-          {NAV_LINKS.map((link) => {
+        <div className={`grid gap-1 ${navLinks.length === 5 ? 'grid-cols-5' : 'grid-cols-4'}`}>
+          {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = activeSection === link.section;
 
