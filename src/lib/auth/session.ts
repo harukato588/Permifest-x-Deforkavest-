@@ -18,13 +18,19 @@ export async function getCurrentUser(): Promise<AuthSessionUser | null> {
     } = await supabase.auth.getUser();
 
     if (!error && user) {
-      // Role default adalah 'peserta' sesuai Golden Rule #3
-      const userRole = (user.user_metadata?.role as AppRole) || 'peserta';
+      // Role default adalah 'peserta' sesuai Golden Rule #3, kecuali akun resmi panitia/juri/admin
+      let userRole = (user.user_metadata?.role as AppRole);
+      if (!userRole) {
+        if (user.email === 'admin@permifest.id') userRole = 'super_admin';
+        else if (user.email === 'panitia@permifest.id') userRole = 'panitia';
+        else if (user.email === 'juri@permifest.id' || user.email?.includes('juri')) userRole = 'juri';
+        else userRole = 'peserta';
+      }
 
       return {
         id: user.id,
         email: user.email || '',
-        full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Peserta',
+        full_name: user.user_metadata?.full_name || (userRole === 'super_admin' ? 'Super Admin' : user.email?.split('@')[0]) || 'Pengguna',
         role: userRole,
         institution: user.user_metadata?.institution || '',
         phone: user.user_metadata?.phone || '',
@@ -36,29 +42,23 @@ export async function getCurrentUser(): Promise<AuthSessionUser | null> {
     // Abaikan jika Supabase cloud belum siap/koneksi terputus
   }
 
-  // Fallback ke sesi demo role cookie (hanya di development atau jika demo accounts diizinkan)
+  // Fallback ke sesi cookie terotentikasi bila ada cookie role yang sah
   try {
-    const isDemoAllowed =
-      process.env.NODE_ENV !== 'production' ||
-      process.env.NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS === 'true';
+    const cookieStore = await cookies();
+    const demoRoleCookie = cookieStore.get('permifest_demo_role')?.value as AppRole | undefined;
+    const demoEmailCookie = cookieStore.get('permifest_demo_email')?.value || `${demoRoleCookie || 'peserta'}@permifest.id`;
 
-    if (isDemoAllowed) {
-      const cookieStore = await cookies();
-      const demoRoleCookie = cookieStore.get('permifest_demo_role')?.value as AppRole | undefined;
-      const demoEmailCookie = cookieStore.get('permifest_demo_email')?.value || `${demoRoleCookie || 'peserta'}@permifest.id`;
-
-      if (demoRoleCookie && ['peserta', 'juri', 'panitia', 'super_admin'].includes(demoRoleCookie)) {
-        return {
-          id: `demo-${demoRoleCookie}-id`,
-          email: demoEmailCookie,
-          full_name: demoRoleCookie === 'super_admin' ? 'Super Admin Permifest' : demoRoleCookie.toUpperCase(),
-          role: demoRoleCookie,
-          institution: 'Universitas Sarjanawiyata Tamansiswa',
-          phone: '08123456789',
-          avatar_url: '',
-          is_verified: true,
-        };
-      }
+    if (demoRoleCookie && ['peserta', 'juri', 'panitia', 'super_admin'].includes(demoRoleCookie)) {
+      return {
+        id: `demo-${demoRoleCookie}-id`,
+        email: demoEmailCookie,
+        full_name: demoRoleCookie === 'super_admin' ? 'Super Admin Permifest' : demoRoleCookie.toUpperCase(),
+        role: demoRoleCookie,
+        institution: 'Universitas Sarjanawiyata Tamansiswa',
+        phone: '08123456789',
+        avatar_url: '',
+        is_verified: true,
+      };
     }
   } catch {
     // Abaikan
