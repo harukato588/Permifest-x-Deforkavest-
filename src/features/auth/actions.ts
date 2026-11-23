@@ -135,7 +135,9 @@ export async function loginAction(
 
     return {
       success: false,
-      message: 'Alamat email atau kata sandi tidak sesuai. Gunakan akun demo atau daftar akun baru.',
+      message: isDemoAllowed
+        ? 'Alamat email atau kata sandi tidak sesuai. Gunakan akun demo atau daftar akun baru.'
+        : 'Alamat email atau kata sandi tidak sesuai. Silakan periksa kembali atau daftar akun baru.',
     };
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Terjadi kesalahan sistem saat mencoba masuk.';

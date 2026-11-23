@@ -20,6 +20,10 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const isDemoAllowed =
+    process.env.NODE_ENV !== 'production' ||
+    process.env.NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS === 'true';
+
   const fillQuickAccount = (demoEmail: string, role: 'peserta' | 'juri' | 'panitia' | 'super_admin') => {
     setEmail(demoEmail);
     setPassword('password123');
@@ -189,43 +193,45 @@ export default function LoginPage() {
                 </SakugaButton>
               </div>
 
-              {/* Quick One-Click Demo Accounts Selector */}
-              <div className="mt-6 p-3.5 rounded-2xl bg-[#0B0720] border border-[#2E2266] space-y-2">
-                <div className="flex items-center justify-between text-[11px] font-bold text-[#A99FD1] uppercase tracking-wider">
-                  <span>Pilih Akun Demo Cepat</span>
-                  <span className="text-[#FFE359]">Klik Otomatis</span>
+              {/* Quick One-Click Demo Accounts Selector (Hanya Tampil di Non-Production / Dev Mode) */}
+              {isDemoAllowed && (
+                <div className="mt-6 p-3.5 rounded-2xl bg-[#0B0720] border border-[#2E2266] space-y-2">
+                  <div className="flex items-center justify-between text-[11px] font-bold text-[#A99FD1] uppercase tracking-wider">
+                    <span>Pilih Akun Demo Cepat</span>
+                    <span className="text-[#FFE359]">Mode Dev / Demo</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => fillQuickAccount('peserta@permifest.id', 'peserta')}
+                      className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#140D33] border border-[#2E2266] hover:border-[#9B6BF2] text-[#F5F2FF] hover:text-[#6CC4FF] transition-all text-left cursor-pointer"
+                    >
+                      Peserta Demo
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => fillQuickAccount('juri@permifest.id', 'juri')}
+                      className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#140D33] border border-[#2E2266] hover:border-[#9B6BF2] text-[#F5F2FF] hover:text-[#FFE359] transition-all text-left cursor-pointer"
+                    >
+                      Dewan Juri
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => fillQuickAccount('panitia@permifest.id', 'panitia')}
+                      className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#140D33] border border-[#2E2266] hover:border-[#9B6BF2] text-[#F5F2FF] hover:text-[#C4F15A] transition-all text-left cursor-pointer"
+                    >
+                      Panitia Lomba
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => fillQuickAccount('admin@permifest.id', 'super_admin')}
+                      className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#140D33] border border-[#2E2266] hover:border-[#9B6BF2] text-[#F5F2FF] hover:text-[#D56BD9] transition-all text-left cursor-pointer"
+                    >
+                      Super Admin
+                    </button>
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 gap-1.5 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => fillQuickAccount('peserta@permifest.id', 'peserta')}
-                    className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#140D33] border border-[#2E2266] hover:border-[#9B6BF2] text-[#F5F2FF] hover:text-[#6CC4FF] transition-all text-left cursor-pointer"
-                  >
-                    Peserta Demo
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => fillQuickAccount('juri@permifest.id', 'juri')}
-                    className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#140D33] border border-[#2E2266] hover:border-[#9B6BF2] text-[#F5F2FF] hover:text-[#FFE359] transition-all text-left cursor-pointer"
-                  >
-                    Dewan Juri
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => fillQuickAccount('panitia@permifest.id', 'panitia')}
-                    className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#140D33] border border-[#2E2266] hover:border-[#9B6BF2] text-[#F5F2FF] hover:text-[#C4F15A] transition-all text-left cursor-pointer"
-                  >
-                    Panitia Lomba
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => fillQuickAccount('admin@permifest.id', 'super_admin')}
-                    className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#140D33] border border-[#2E2266] hover:border-[#9B6BF2] text-[#F5F2FF] hover:text-[#D56BD9] transition-all text-left cursor-pointer"
-                  >
-                    Super Admin
-                  </button>
-                </div>
-              </div>
+              )}
 
               <div className="text-center text-xs text-[#A99FD1] pt-3 border-t border-[#2E2266]/80">
                 Belum punya akun?{' '}
