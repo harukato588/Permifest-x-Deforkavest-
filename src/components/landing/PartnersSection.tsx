@@ -120,46 +120,6 @@ export function PartnersSection() {
         </div>
       </div>
 
-      {/* ── 2. Sponsor & Media Partner (Dinamis dari Admin Panel) ── */}
-      {sponsors.length > 0 && (
-        <div className="pt-6 border-t border-[#2E2266]/70">
-          <p className="text-center text-xs font-bold uppercase tracking-widest text-[#E6C978] mb-5">
-            Sponsor &amp; Mitra Pendukung
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-            {sponsors.map((sp) => (
-              <a
-                key={sp.id}
-                href={sp.website_url || '#'}
-                target={sp.website_url ? '_blank' : undefined}
-                rel="noopener noreferrer"
-                className="group p-4 px-5 rounded-2xl border border-[#2E2266] bg-[#140D33]/70 hover:bg-[#140D33] hover:border-[#FFE359] transition-all flex flex-col items-center justify-center min-w-[140px] text-center"
-              >
-                {sp.logo_url && (
-                  <div className="h-10 w-full flex items-center justify-center mb-2">
-                    <Image
-                      src={sp.logo_url}
-                      alt={sp.name}
-                      width={120}
-                      height={32}
-                      unoptimized
-                      style={{ width: 'auto', height: 'auto' }}
-                      className="max-h-8 max-w-[120px] object-contain opacity-85 group-hover:opacity-100 transition-opacity"
-                    />
-                  </div>
-                )}
-                <span className="text-xs font-bold text-[#F5F2FF] group-hover:text-white transition-colors">
-                  {sp.name}
-                </span>
-                <span className="text-[10px] text-[#A99FD1] mt-0.5 capitalize">
-                  {sp.tier ? `${sp.tier} Partner` : 'Mitra'}
-                </span>
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* ── Callout Sponsoring & Media Partnership ── */}
       <div className="mt-10 p-5 rounded-2xl bg-[#0B0720] border border-[#2E2266] flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
