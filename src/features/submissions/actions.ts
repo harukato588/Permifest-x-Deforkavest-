@@ -3,11 +3,23 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireUser } from '@/lib/auth/session';
 import { SubmitWorkSchema, type SubmitWorkInput } from './schema';
+import { getAllSubmissionsForAdminQuery, type SubmissionRow } from './queries';
 
 export interface ActionResult<T = void> {
   success: boolean;
   data?: T;
   error?: string;
+}
+
+/**
+ * Server Action: Mengambil data submission untuk panel admin
+ */
+export async function getSubmissionsForAdminAction(filters?: {
+  competitionId?: string;
+  stageId?: string;
+  onlyLatest?: boolean;
+}): Promise<SubmissionRow[]> {
+  return await getAllSubmissionsForAdminQuery(filters);
 }
 
 /**

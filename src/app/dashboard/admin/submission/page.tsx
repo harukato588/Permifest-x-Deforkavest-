@@ -13,8 +13,8 @@ import { useAppStore } from '@/lib/store';
 import { formatDateShort } from '@/lib/utils';
 import { Submission } from '@/lib/types';
 import { getFileDownloadUrl } from '@/lib/supabase/storage-client';
-import { isSupabaseLive } from '@/lib/repositories';
-import { getAllSubmissionsForAdminQuery } from '@/features/submissions/queries';
+import { isSupabaseLive } from '@/lib/supabase/env';
+import { getSubmissionsForAdminAction } from '@/features/submissions/actions';
 import {
   FileText,
   DownloadSimple,
@@ -42,7 +42,7 @@ export default function AdminSubmissionPage() {
 
   React.useEffect(() => {
     if (!isSupabaseLive()) return;
-    getAllSubmissionsForAdminQuery()
+    getSubmissionsForAdminAction()
       .then((rows) => {
         const mapped: Submission[] = rows.map((r) => ({
           id: r.id,
