@@ -5,12 +5,12 @@ import {
   User, 
   UserRole, 
   Competition, 
-  Registration, 
+  Registration,
   RegistrationStatus,
-  Submission, 
-  JudgeAssignment, 
-  Announcement, 
-  AuditLog, 
+  Submission,
+  JudgeAssignment,
+  Announcement,
+  AuditLog,
   MatchResult,
   RubricCriteria,
   SystemSettings,
@@ -21,12 +21,12 @@ import {
   EventItem,
   DynamicFaqItem,
 } from './types';
-import { 
-  MOCK_REGISTRATIONS, 
-  MOCK_SUBMISSIONS, 
-  MOCK_JUDGE_ASSIGNMENTS, 
-  MOCK_ANNOUNCEMENTS, 
-  MOCK_AUDIT_LOGS, 
+import {
+  MOCK_REGISTRATIONS,
+  MOCK_SUBMISSIONS,
+  MOCK_JUDGE_ASSIGNMENTS,
+  MOCK_ANNOUNCEMENTS,
+  MOCK_AUDIT_LOGS,
   MOCK_MATCH_RESULTS,
   MOCK_RUBRIC_CRITERIA,
   MOCK_PARTNERS,
@@ -71,7 +71,7 @@ interface AppContextType {
   systemSettings: SystemSettings;
   scoreChanges: ScoreChange[];
   timelineEvents: TimelineEvent[];
-  
+
   // Actions - Pendaftaran & Pembayaran
   registerCompetition: (competitionId: string, formData: Record<string, unknown>) => Promise<Registration>;
   addRegistrationManual: (data: { userId: string; competitionId: string; status: RegistrationStatus; teamName?: string }) => Promise<Registration>;
@@ -174,8 +174,6 @@ function getInitialUser(): User {
       if (matchRole && matchRole[1]) {
         const roleFromCookie = decodeURIComponent(matchRole[1]) as UserRole;
         const emailFromCookie = matchEmail ? decodeURIComponent(matchEmail[1]) : `${roleFromCookie}@permifest.id`;
-        const matched = MOCK_USERS.find((u) => u.role === roleFromCookie);
-        if (matched) return { ...matched, email: emailFromCookie };
         return {
           id: `user-${roleFromCookie}`,
           email: emailFromCookie,
@@ -200,7 +198,7 @@ function getInitialUser(): User {
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User>(getInitialUser);
-  const [availableUsers, setAvailableUsers] = useState<User[]>(MOCK_USERS);
+  const [availableUsers, setAvailableUsers] = useState<User[]>([]);
   const [competitions, setCompetitions] = useState<Competition[]>(INITIAL_COMPETITIONS);
   const [registrations, setRegistrations] = useState<Registration[]>(MOCK_REGISTRATIONS);
   const [submissions, setSubmissions] = useState<Submission[]>(MOCK_SUBMISSIONS);
@@ -246,7 +244,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Logout menyeluruh: reset state client, panggil API logout server, dan redirect ke /login
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+      await fetch('/api/auth/logout', { method: 'POST' }).catch(() => { });
     } catch {
       // Abaikan bila offline
     }
@@ -410,8 +408,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // --- Submission & Juri ---
   const submitWork = async (
-    registrationId: string, 
-    stageId: string, 
+    registrationId: string,
+    stageId: string,
     data: { fileUrl?: string; fileName?: string; linkUrl?: string; notes?: string }
   ) => {
     const reg = registrations.find(r => r.id === registrationId);
@@ -472,7 +470,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   const submitJudgeScore = async (
-    assignmentId: string, 
+    assignmentId: string,
     scoresInput: { criteriaId: string; score: number; comment?: string }[]
   ) => {
     let totalWeighted = 0;
@@ -762,8 +760,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           if (stage.submission_close_at) {
             const dateStr = stage.submission_close_at.split('T')[0];
             const isFinal = stage.name.toLowerCase().includes('final');
-            const title = isFinal 
-              ? `Babak Final & Presentasi: ${comp.name}` 
+            const title = isFinal
+              ? `Babak Final & Presentasi: ${comp.name}`
               : `Batas Pengumpulan Berkas: ${comp.name} (${stage.name})`;
             const exists = timelineEvents.some(
               (e) => e.tanggal_mulai === dateStr && e.cabang_id === comp.id && e.judul.includes(stage.name)
