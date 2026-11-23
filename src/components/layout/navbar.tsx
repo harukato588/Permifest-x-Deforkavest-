@@ -139,8 +139,8 @@ export function Navbar() {
         className="mobile-floating-nav fixed inset-x-3 z-50 mx-auto max-w-md rounded-full border border-border bg-background/75 p-2 shadow-md backdrop-blur-md md:hidden"
         aria-label="Navigasi bagian"
       >
-        <div className={`grid gap-1 ${navLinks.length === 5 ? 'grid-cols-5' : 'grid-cols-4'}`}>
-          {navLinks.map((link) => {
+        <div className="grid grid-cols-5 gap-0">
+          {NAV_LINKS.map((link) => {
             const Icon = link.icon;
             const isActive = activeSection === link.section;
 
@@ -151,7 +151,7 @@ export function Navbar() {
                 onClick={() => setActiveSection(link.section)}
                 aria-current={isActive ? 'location' : undefined}
                 className={[
-                  'flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-center transition-colors',
+                  'flex min-w-0 min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl px-0 text-center transition-colors',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card',
                   isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
                 ].join(' ')}
@@ -166,7 +166,9 @@ export function Navbar() {
                 >
                   <Icon size={19} weight={isActive ? 'fill' : 'regular'} aria-hidden="true" />
                 </span>
-                <span className="text-[11px] font-medium leading-tight">{link.label}</span>
+                <span className="whitespace-nowrap text-[9px] font-medium leading-tight">
+                  {link.label}
+                </span>
               </Link>
             );
           })}
