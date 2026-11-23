@@ -165,39 +165,10 @@ const GUEST_USER: User = {
   email_verified: false,
 };
 
-function getInitialUser(): User {
-  if (typeof window !== 'undefined') {
-    try {
-      // 1. Prioritaskan cookie demo role yang aktif dari sesi login
-      const matchRole = document.cookie.match(/permifest_demo_role=([^;]+)/);
-      const matchEmail = document.cookie.match(/permifest_demo_email=([^;]+)/);
-      if (matchRole && matchRole[1]) {
-        const roleFromCookie = decodeURIComponent(matchRole[1]) as UserRole;
-        const emailFromCookie = matchEmail ? decodeURIComponent(matchEmail[1]) : `${roleFromCookie}@permifest.id`;
-        return {
-          id: `user-${roleFromCookie}`,
-          email: emailFromCookie,
-          full_name: roleFromCookie === 'super_admin' ? 'Administrator Utama' : roleFromCookie.toUpperCase(),
-          role: roleFromCookie,
-          email_verified: true,
-        };
-      }
-
-      // 2. Baca dari localStorage
-      const saved = localStorage.getItem('permifest_user');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && parsed.role) return parsed;
-      }
-    } catch {
-      // Abaikan bila di lingkungan server SSR
-    }
-  }
-  return GUEST_USER;
-}
-
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<User>(getInitialUser);
+  // Always start with GUEST_USER so SSR and client initial render match (prevents hydration mismatch).
+  // Browser storage is read in a useEffect below, which only runs on the client after mount.
+  const [currentUser, setCurrentUser] = useState<User>(GUEST_USER);
   const [availableUsers, setAvailableUsers] = useState<User[]>([]);
   const [competitions, setCompetitions] = useState<Competition[]>(INITIAL_COMPETITIONS);
   const [registrations, setRegistrations] = useState<Registration[]>(MOCK_REGISTRATIONS);
@@ -214,6 +185,36 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [guidebooks, setGuidebooks] = useState<Guidebook[]>(MOCK_GUIDEBOOKS);
   const [events, setEvents] = useState<EventItem[]>(MOCK_EVENTS);
   const [faqs, setFaqs] = useState<DynamicFaqItem[]>(MOCK_FAQS);
+
+  // Hydrate dari browser storage setelah mount (client only) — mencegah SSR hydration mismatch.
+  // setState di dalam mount-only useEffect adalah pola resmi React untuk client-side hydration.
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    try {
+      // 1. Prioritaskan cookie demo role
+      const matchRole = document.cookie.match(/permifest_demo_role=([^;]+)/);
+      const matchEmail = document.cookie.match(/permifest_demo_email=([^;]+)/);
+      if (matchRole && matchRole[1]) {
+        const roleFromCookie = decodeURIComponent(matchRole[1]) as UserRole;
+        const emailFromCookie = matchEmail ? decodeURIComponent(matchEmail[1]) : `${roleFromCookie}@permifest.id`;
+        setCurrentUser({
+          id: `user-${roleFromCookie}`,
+          email: emailFromCookie,
+          full_name: roleFromCookie === 'super_admin' ? 'Administrator Utama' : roleFromCookie.toUpperCase(),
+          role: roleFromCookie,
+          email_verified: true,
+        });
+        return;
+      }
+      // 2. Baca dari localStorage
+      const saved = localStorage.getItem('permifest_user');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.role) setCurrentUser(parsed);
+      }
+    } catch {}
+  }, []); // mount-only: runs once on client after hydration
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Simpan setiap kali currentUser berubah
   useEffect(() => {
