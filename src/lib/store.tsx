@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
   User, 
   UserRole, 
@@ -158,8 +158,41 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+function getInitialUser(): User {
+  if (typeof window !== 'undefined') {
+    try {
+      // 1. Prioritaskan cookie demo role yang aktif dari sesi login
+      const matchRole = document.cookie.match(/permifest_demo_role=([^;]+)/);
+      const matchEmail = document.cookie.match(/permifest_demo_email=([^;]+)/);
+      if (matchRole && matchRole[1]) {
+        const roleFromCookie = decodeURIComponent(matchRole[1]) as UserRole;
+        const emailFromCookie = matchEmail ? decodeURIComponent(matchEmail[1]) : `${roleFromCookie}@permifest.id`;
+        const matched = MOCK_USERS.find((u) => u.role === roleFromCookie);
+        if (matched) return { ...matched, email: emailFromCookie };
+        return {
+          id: `user-${roleFromCookie}`,
+          email: emailFromCookie,
+          full_name: roleFromCookie === 'super_admin' ? 'Administrator Utama' : roleFromCookie.toUpperCase(),
+          role: roleFromCookie,
+          email_verified: true,
+        };
+      }
+
+      // 2. Baca dari localStorage
+      const saved = localStorage.getItem('permifest_user');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.role) return parsed;
+      }
+    } catch {
+      // Abaikan bila di lingkungan server SSR
+    }
+  }
+  return MOCK_USERS[0];
+}
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<User>(MOCK_USERS[0]); // default to peserta
+  const [currentUser, setCurrentUser] = useState<User>(getInitialUser);
   const [availableUsers, setAvailableUsers] = useState<User[]>(MOCK_USERS);
   const [competitions, setCompetitions] = useState<Competition[]>(INITIAL_COMPETITIONS);
   const [registrations, setRegistrations] = useState<Registration[]>(MOCK_REGISTRATIONS);
@@ -177,6 +210,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [events, setEvents] = useState<EventItem[]>(MOCK_EVENTS);
   const [faqs, setFaqs] = useState<DynamicFaqItem[]>(MOCK_FAQS);
 
+  // Simpan setiap kali currentUser berubah
+  useEffect(() => {
+    if (typeof window !== 'undefined' && currentUser && currentUser.role) {
+      try {
+        localStorage.setItem('permifest_user', JSON.stringify(currentUser));
+      } catch {}
+    }
+  }, [currentUser]);
+
   // Switch role easily for demo & testing
   const switchRole = (role: UserRole) => {
     const userForRole = availableUsers.find(u => u.role === role) || {
@@ -187,6 +229,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       email_verified: true,
     };
     setCurrentUser(userForRole);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('permifest_user', JSON.stringify(userForRole));
+      } catch {}
+    }
   };
 
   // Logout menyeluruh: reset state client, panggil API logout server, dan redirect ke /login
