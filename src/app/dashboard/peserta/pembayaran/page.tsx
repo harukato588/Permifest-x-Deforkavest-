@@ -12,7 +12,7 @@ import { EmptyState } from '@/components/dashboard/EmptyState';
 import { useAppStore } from '@/lib/store';
 import { formatCurrency } from '@/lib/utils';
 import { uploadFileDirectly } from '@/lib/supabase/storage-client';
-import { isSupabaseLive } from '@/lib/repositories';
+import { isSupabaseLive } from '@/lib/supabase/status';
 import { submitPaymentProofAction } from '@/features/registrations/actions';
 import {
   CreditCard,

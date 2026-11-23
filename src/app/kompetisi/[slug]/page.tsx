@@ -13,7 +13,7 @@ import { Modal } from '@/components/ui/modal';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useAppStore } from '@/lib/store';
 import { formatCurrency, formatDateWIB } from '@/lib/utils';
-import { isSupabaseLive } from '@/lib/repositories';
+import { isSupabaseLive } from '@/lib/supabase/status';
 import { registerCompetitionAction } from '@/features/registrations/actions';
 import { 
   ArrowLeft, 

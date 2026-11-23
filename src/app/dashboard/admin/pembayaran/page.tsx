@@ -17,7 +17,7 @@ import { useAppStore } from '@/lib/store';
 import { formatCurrency, formatDateShort } from '@/lib/utils';
 import { Registration } from '@/lib/types';
 import { getFileDownloadUrl } from '@/lib/supabase/storage-client';
-import { isSupabaseLive } from '@/lib/repositories';
+import { isSupabaseLive } from '@/lib/supabase/status';
 import { verifyPaymentAction } from '@/features/registrations/actions';
 import {
   CreditCard,
