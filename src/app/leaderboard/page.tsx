@@ -94,32 +94,38 @@ export default function LeaderboardPage() {
           </div>
 
           <div className="divide-y divide-slate-800/80">
-            {filtered.map((item, idx) => (
-              <div key={idx} className="p-4 sm:p-5 flex items-center justify-between gap-4 hover:bg-slate-800/20 transition-colors">
-                <div className="flex items-center gap-4">
-                  {getRankBadge(item.rank)}
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-100">{item.participant_name}</h4>
-                    <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
-                      <span>{item.institution}</span>
-                      <span>•</span>
-                      <span className="text-cyan-400">{item.competition_name}</span>
+            {filtered.length === 0 ? (
+              <div className="p-8 text-center text-xs text-slate-400 italic">
+                Hasil kompetisi resmi belum dirilis oleh panitia.
+              </div>
+            ) : (
+              filtered.map((item, idx) => (
+                <div key={idx} className="p-4 sm:p-5 flex items-center justify-between gap-4 hover:bg-slate-800/20 transition-colors">
+                  <div className="flex items-center gap-4">
+                    {getRankBadge(item.rank)}
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-100">{item.participant_name}</h4>
+                      <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
+                        <span>{item.institution}</span>
+                        <span>•</span>
+                        <span className="text-cyan-400">{item.competition_name}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="text-right shrink-0">
-                  {item.score ? (
-                    <div>
-                      <div className="text-xs text-slate-500">Nilai Akhir</div>
-                      <div className="text-base font-bold font-mono text-cyan-400">{item.score} / 100</div>
-                    </div>
-                  ) : (
-                    <Badge variant="warning">{item.notes || 'Pemenang'}</Badge>
-                  )}
+                  <div className="text-right shrink-0">
+                    {item.score ? (
+                      <div>
+                        <div className="text-xs text-slate-500">Nilai Akhir</div>
+                        <div className="text-base font-bold font-mono text-cyan-400">{item.score} / 100</div>
+                      </div>
+                    ) : (
+                      <Badge variant="warning">{item.notes || 'Pemenang'}</Badge>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </Card>
       </section>

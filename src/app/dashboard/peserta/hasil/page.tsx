@@ -16,11 +16,11 @@ export default function PesertaHasilPage() {
   const myRegistrations = registrations.filter((r) => r.user_id === currentUser.id);
 
   // Cocokkan data peserta dengan peringkat hasil akhir yang dirilis
-  const myResults = MOCK_LEADERBOARDS.filter((l) => 
-    l.participant_name.toLowerCase().includes(currentUser.full_name.toLowerCase()) ||
-    l.participant_name.toLowerCase().includes('ahmad') ||
-    l.participant_name.toLowerCase().includes('fauzi')
-  );
+  const myResults = currentUser?.full_name
+    ? MOCK_LEADERBOARDS.filter((l) =>
+        l.participant_name.toLowerCase().includes(currentUser.full_name.toLowerCase())
+      )
+    : [];
 
   return (
     <DashboardLayout 
