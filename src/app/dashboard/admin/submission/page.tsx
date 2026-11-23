@@ -13,6 +13,8 @@ import { useAppStore } from '@/lib/store';
 import { formatDateShort } from '@/lib/utils';
 import { Submission } from '@/lib/types';
 import { getFileDownloadUrl } from '@/lib/supabase/storage-client';
+import { isSupabaseLive } from '@/lib/repositories';
+import { getAllSubmissionsForAdminQuery } from '@/features/submissions/queries';
 import {
   FileText,
   DownloadSimple,
@@ -31,13 +33,69 @@ export default function AdminSubmissionPage() {
   const { submissions, deleteSubmission, competitions } = useAppStore();
 
   const [compFilter, setCompFilter] = useState('all');
+  const [liveSubmissions, setLiveSubmissions] = useState<Submission[]>([]);
   const [deleteConfirmSub, setDeleteConfirmSub] = useState<Submission | null>(null);
   const [previewSub, setPreviewSub] = useState<Submission | null>(null);
   const [alertSuccess, setAlertSuccess] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
   const [openingFile, setOpeningFile] = useState(false);
 
-  const filteredSubmissions = submissions.filter((s) => {
+  React.useEffect(() => {
+    if (!isSupabaseLive()) return;
+    getAllSubmissionsForAdminQuery()
+      .then((rows) => {
+        const mapped: Submission[] = rows.map((r) => ({
+          id: r.id,
+          registration_id: r.registration_id,
+          registration: {
+            id: r.registration_id,
+            user_id: '',
+            competition_id: '',
+            competition: {
+              id: '',
+              name: r.competition_name || '',
+              slug: r.competition_slug || '',
+            } as unknown as NonNullable<Submission['registration']>['competition'],
+            user: {
+              id: '',
+              full_name: r.participant_name || '',
+              email: r.participant_email || '',
+              role: 'peserta',
+              email_verified: true,
+            },
+            status: 'verified',
+            registered_at: r.submitted_at,
+            form_data: {},
+          },
+          stage_id: r.stage_id,
+          stage: {
+            id: r.stage_id,
+            competition_id: '',
+            name: r.stage_name || '',
+            slug: '',
+            stage_order: 1,
+            submission_open_at: '',
+            submission_close_at: '',
+            is_active: true,
+          },
+          file_name: r.original_filename || undefined,
+          file_url: r.storage_path || undefined,
+          link_url: r.link_url || undefined,
+          version: r.version,
+          is_latest: r.is_latest,
+          notes: r.notes || undefined,
+          submitted_at: r.submitted_at,
+        }));
+        setLiveSubmissions(mapped);
+      })
+      .catch((err) => {
+        console.error('Failed to load live submissions:', err);
+      });
+  }, []);
+
+  const currentSubmissions = isSupabaseLive() ? liveSubmissions : submissions;
+
+  const filteredSubmissions = currentSubmissions.filter((s) => {
     if (compFilter === 'all') return true;
     return s.registration?.competition_id === compFilter;
   });
