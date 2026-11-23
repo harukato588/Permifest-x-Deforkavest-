@@ -15,8 +15,8 @@ export default function LoginPage() {
   const router = useRouter();
   const { switchRole } = useAppStore();
 
-  const [email, setEmail] = useState('peserta@permifest.id');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
