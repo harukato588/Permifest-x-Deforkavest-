@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    "dev:turbo": "next dev --turbopack",
+    "build": "next build --webpack",
+    "build:turbo": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "eslint"
@@ -13,8 +15,10 @@
     "@phosphor-icons/react": "^2.1.10",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.119.1",
+    "@tailwindcss/postcss": "^4.3.5",
     "lucide-react": "^1.75.0",
     "next": "16.4.6",
+    "postcss": "^8.5.33",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "server-only": "^0.0.1",
