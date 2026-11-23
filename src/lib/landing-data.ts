@@ -233,56 +233,7 @@ export function getTimelineEvents(): TimelineEvent[] {
  * [PLACEHOLDER] Cuplikan peringkat top 3 per cabang
  */
 export function getLeaderboardTeaser(): LeaderboardEntry[] {
-  return [
-    {
-      rank: 1,
-      nama: 'Ahmad Faiz & Tim',
-      instansi: 'Universitas Gadjah Mada',
-      skor: 94.5,
-      cabang_id: 'comp-2',
-      cabang_nama: 'UI/UX Design',
-    },
-    {
-      rank: 2,
-      nama: 'Rian Kurniawan',
-      instansi: 'Universitas Sarjanawiyata Tamansiswa',
-      skor: 91.0,
-      cabang_id: 'comp-2',
-      cabang_nama: 'UI/UX Design',
-    },
-    {
-      rank: 3,
-      nama: 'Citra Dewi',
-      instansi: 'Institut Teknologi Bandung',
-      skor: 88.5,
-      cabang_id: 'comp-2',
-      cabang_nama: 'UI/UX Design',
-    },
-    {
-      rank: 1,
-      nama: 'Bima Sakti Squad',
-      instansi: 'UPN Veteran Yogyakarta',
-      skor: 96.0,
-      cabang_id: 'comp-3',
-      cabang_nama: 'IT System Arch',
-    },
-    {
-      rank: 2,
-      nama: 'CloudSentinels',
-      instansi: 'Telkom University',
-      skor: 92.5,
-      cabang_id: 'comp-3',
-      cabang_nama: 'IT System Arch',
-    },
-    {
-      rank: 3,
-      nama: 'ByteVanguard',
-      instansi: 'AMIKOM Yogyakarta',
-      skor: 89.0,
-      cabang_id: 'comp-3',
-      cabang_nama: 'IT System Arch',
-    },
-  ];
+  return [];
 }
 
 // ─── FAQ Items ─────────────────────────────────────────────────────────────

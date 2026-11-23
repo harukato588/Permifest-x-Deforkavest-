@@ -22,7 +22,6 @@ import {
   DynamicFaqItem,
 } from './types';
 import { 
-  MOCK_USERS, 
   MOCK_REGISTRATIONS, 
   MOCK_SUBMISSIONS, 
   MOCK_JUDGE_ASSIGNMENTS, 
@@ -158,9 +157,17 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+const GUEST_USER: User = {
+  id: '',
+  email: '',
+  full_name: '',
+  role: '' as UserRole,
+  email_verified: false,
+};
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<User>(MOCK_USERS[0]); // default to peserta
-  const [availableUsers, setAvailableUsers] = useState<User[]>(MOCK_USERS);
+  const [currentUser, setCurrentUser] = useState<User>(GUEST_USER);
+  const [availableUsers, setAvailableUsers] = useState<User[]>([]);
   const [competitions, setCompetitions] = useState<Competition[]>(INITIAL_COMPETITIONS);
   const [registrations, setRegistrations] = useState<Registration[]>(MOCK_REGISTRATIONS);
   const [submissions, setSubmissions] = useState<Submission[]>(MOCK_SUBMISSIONS);

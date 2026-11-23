@@ -38,16 +38,16 @@ export default function AdminOverviewPage() {
   const academicPercent = Math.round((academicRegs.length / totalRegs) * 100);
   const nonAcademicPercent = 100 - academicPercent;
 
-  // Mock data tren 7 hari terakhir untuk visual chart
+  // Tren 7 hari terakhir untuk visual chart
   const weeklyTrends = useMemo(() => {
     return [
-      { day: 'Sen', count: 3, amount: 150000 },
-      { day: 'Sel', count: 5, amount: 250000 },
-      { day: 'Rab', count: 4, amount: 200000 },
-      { day: 'Kam', count: 8, amount: 400000 },
-      { day: 'Jum', count: 6, amount: 300000 },
-      { day: 'Sab', count: 11, amount: 550000 },
-      { day: 'Min', count: registrations.length || 14, amount: totalIncome || 700000 },
+      { day: 'Sen', count: 0, amount: 0 },
+      { day: 'Sel', count: 0, amount: 0 },
+      { day: 'Rab', count: 0, amount: 0 },
+      { day: 'Kam', count: 0, amount: 0 },
+      { day: 'Jum', count: 0, amount: 0 },
+      { day: 'Sab', count: 0, amount: 0 },
+      { day: 'Min', count: registrations.length, amount: totalIncome },
     ];
   }, [registrations.length, totalIncome]);
 
