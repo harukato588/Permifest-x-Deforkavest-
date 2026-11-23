@@ -13,6 +13,8 @@ import { EmptyState } from '@/components/dashboard/EmptyState';
 import { useAppStore } from '@/lib/store';
 import { formatDateWIB } from '@/lib/utils';
 import { uploadFileDirectly } from '@/lib/supabase/storage-client';
+import { isSupabaseLive } from '@/lib/repositories';
+import { submitWorkAction } from '@/features/submissions/actions';
 import {
   UploadSimple,
   FileText,
@@ -99,6 +101,24 @@ export default function PesertaSubmissionPage() {
         }
 
         finalStoragePath = uploadRes.storagePath;
+      }
+
+      if (isSupabaseLive()) {
+        const subRes = await submitWorkAction({
+          registration_id: activeRegId,
+          stage_id: activeStageId,
+          kind: isFigmaRequired ? 'link' : 'file',
+          storage_path: isFigmaRequired ? undefined : finalStoragePath,
+          original_filename: isFigmaRequired ? undefined : (fileName || selectedFile?.name),
+          mime: selectedFile?.type,
+          size_bytes: selectedFile?.size,
+          link_url: isFigmaRequired ? figmaLink : undefined,
+          notes: notes,
+        });
+
+        if (!subRes.success) {
+          throw new Error(subRes.error || 'Gagal menyimpan karya ke sistem.');
+        }
       }
 
       await submitWork(activeRegId, activeStageId, {

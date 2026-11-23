@@ -5,6 +5,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/). Versi: SemV
 ## [Unreleased]
 
 ### Added
+- Modul Pengumpulan Karya Peserta (Submission - T3.1):
+  - Modul domain `src/features/submissions/` dengan validasi Zod (`schema.ts`), queries database server-side (`queries.ts`), dan Server Action `submitWorkAction` (`actions.ts`).
+  - Penegakan integritas server-side: verifikasi kepemilikan registrasi, pengecekan status pendaftaran terverifikasi, validasi deadline tahapan lomba, penomoran versi otomatis (`version = 1, 2, ...` & `is_latest`), serta pencatatan ke `audit_logs`.
+  - Integrasi live halaman pengumpulan peserta di `/dashboard/peserta/submission` (unggah berkas PDF/DOCX ke Supabase Storage bucket `submissions` via signed URL, atau input tautan Figma) dengan dukungan animasi Sakuga Button.
+  - Integrasi live halaman pemantauan submission panitia di `/dashboard/admin/submission` (tabel karya masuk, filter cabang lomba, pratinjau, dan unduhan berkas melalui signed download URL bertenggat waktu).
 - Integrasi Kalender Acara & Ekspor Mandiri (`src/lib/calendar.ts`):
   - Generator URL Google Calendar otomatis dan file iCalendar (`.ics`) standar RFC 5545 yang kompatibel langsung dengan Google Calendar, Apple Calendar (iPhone/Mac), dan Microsoft Outlook.
   - Penyatuan agenda seminar, webinar teknologi, workshop, dan malam penganugerahan ke dalam kalender publik `TimelineSection.tsx` (grid Desember 2026 dan mode daftar terpadu) lengkap dengan tombol ekspor kalender dan filter kategori (*Semua Acara*, *Tahapan Lomba*, *Seminar & Workshop*).
