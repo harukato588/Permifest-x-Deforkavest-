@@ -179,6 +179,11 @@ export default function LoginPage() {
                 </SakugaButton>
               </div>
 
+<<<<<<< HEAD
+=======
+              {/* Quick One-Click Demo Accounts Selector (Hanya Tampil di Non-Production / Dev Mode) */}
+
+>>>>>>> a499197 (fix(auth): remove demo account selector)
               <div className="text-center text-xs text-[#A99FD1] pt-3 border-t border-[#2E2266]/80">
                 Belum punya akun?{' '}
                 <Link href="/register" className="text-[#F5F2FF] font-bold hover:text-[#9B6BF2] transition-colors underline">
