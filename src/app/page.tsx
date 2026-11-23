@@ -3,6 +3,7 @@ import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { CountdownTimer } from '@/components/landing/CountdownTimer';
+import { PartnersSection } from '@/components/landing/PartnersSection';
 import { CompetitionsSection } from '@/components/landing/CompetitionsSection';
 import { TimelineSection } from '@/components/landing/TimelineSection';
 import { EventsSection } from '@/components/landing/EventsSection';
@@ -35,6 +36,7 @@ export default async function HomePage() {
       <main id="main-content" className="flex-1">
         <HeroSection />
         <CountdownTimer />
+        <PartnersSection />
         <CompetitionsSection id="lomba" initialCompetitions={competitions} />
         <TimelineSection id="jadwal" />
         <EventsSection id="agenda" />
