@@ -567,8 +567,8 @@ export default function AdminEventsPage() {
           description="Atur informasi narasumber, format online/offline, jadwal, dan link pendaftaran."
           size="lg"
         >
-          <form onSubmit={handleSubmit} className="flex-1 flex flex-col justify-between">
-            <DrawerContent className="space-y-4">
+          <form onSubmit={handleSubmit} className="flex-1 min-h-0 flex flex-col justify-between overflow-hidden">
+            <DrawerContent className="space-y-5 p-5 sm:p-6 overflow-y-auto">
               {drawerError && (
                 <Alert variant="destructive">
                   <AlertTitle>Kesalahan Formulir</AlertTitle>
@@ -576,177 +576,201 @@ export default function AdminEventsPage() {
                 </Alert>
               )}
 
-              {/* Judul Event */}
-              <div>
-                <label className="block text-xs font-bold text-foreground mb-1.5">
-                  Judul Agenda Acara <span className="text-destructive">*</span>
-                </label>
-                <Input
-                  required
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="misal: Seminar Nasional AI & Keamanan Siber 2026"
-                />
-              </div>
-
-              {/* Tipe & Format */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-foreground mb-1.5">
-                    Jenis Agenda <span className="text-destructive">*</span>
-                  </label>
-                  <select
-                    value={formData.type}
-                    onChange={(e) => setFormData({ ...formData, type: e.target.value as EventType })}
-                    className="w-full px-3 py-2 rounded-xl text-xs bg-background border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                  >
-                    <option value="seminar">Seminar Nasional</option>
-                    <option value="webinar">Webinar Online</option>
-                    <option value="workshop">Hands-on Workshop</option>
-                    <option value="ceremony">Ceremony & Penutupan</option>
-                  </select>
+              {/* Bagian 1: Informasi Utama */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border shadow-xs space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b border-border/70">
+                  <span className="w-2 h-2 rounded-full bg-primary" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
+                    1. Informasi Dasar Acara
+                  </h4>
                 </div>
 
+                {/* Judul Event */}
                 <div>
                   <label className="block text-xs font-bold text-foreground mb-1.5">
-                    Format Pelaksanaan <span className="text-destructive">*</span>
-                  </label>
-                  <select
-                    value={formData.format}
-                    onChange={(e) => setFormData({ ...formData, format: e.target.value as EventFormat })}
-                    className="w-full px-3 py-2 rounded-xl text-xs bg-background border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                  >
-                    <option value="hybrid">Hybrid (Daring & Luring)</option>
-                    <option value="offline">Luring di Kampus UST</option>
-                    <option value="online">Daring (Zoom / Streaming)</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Jadwal Mulai & Selesai */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-foreground mb-1.5">
-                    Waktu Mulai <span className="text-destructive">*</span>
-                  </label>
-                  <Input
-                    type="datetime-local"
-                    required
-                    value={formData.start_time}
-                    onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-foreground mb-1.5">
-                    Waktu Selesai (Opsional)
-                  </label>
-                  <Input
-                    type="datetime-local"
-                    value={formData.end_time}
-                    onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
-                  />
-                </div>
-              </div>
-
-              {/* Lokasi & Tautan Maps/Stream */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-foreground mb-1.5">
-                    Nama Lokasi / Ruang <span className="text-destructive">*</span>
+                    Judul Agenda Acara <span className="text-destructive">*</span>
                   </label>
                   <Input
                     required
-                    value={formData.location_name}
-                    onChange={(e) => setFormData({ ...formData, location_name: e.target.value })}
-                    placeholder="misal: Auditorium Ki Hadjar Dewantara UST"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="misal: Seminar Nasional AI & Keamanan Siber 2026"
                   />
                 </div>
+
+                {/* Tipe & Format */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-xs font-bold text-foreground mb-1.5">
+                      Jenis Agenda <span className="text-destructive">*</span>
+                    </label>
+                    <select
+                      value={formData.type}
+                      onChange={(e) => setFormData({ ...formData, type: e.target.value as EventType })}
+                      className="w-full px-3 py-2 rounded-xl text-xs bg-background border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary h-9"
+                    >
+                      <option value="seminar">Seminar Nasional</option>
+                      <option value="webinar">Webinar Online</option>
+                      <option value="workshop">Hands-on Workshop</option>
+                      <option value="ceremony">Ceremony & Penutupan</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-foreground mb-1.5">
+                      Format Pelaksanaan <span className="text-destructive">*</span>
+                    </label>
+                    <select
+                      value={formData.format}
+                      onChange={(e) => setFormData({ ...formData, format: e.target.value as EventFormat })}
+                      className="w-full px-3 py-2 rounded-xl text-xs bg-background border border-border text-foreground focus:outline-none focus:ring-1 focus:ring-primary h-9"
+                    >
+                      <option value="hybrid">Hybrid (Daring & Luring)</option>
+                      <option value="offline">Luring di Kampus UST</option>
+                      <option value="online">Daring (Zoom / Streaming)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Jadwal Mulai & Selesai */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-xs font-bold text-foreground mb-1.5">
+                      Waktu Mulai <span className="text-destructive">*</span>
+                    </label>
+                    <Input
+                      type="datetime-local"
+                      required
+                      value={formData.start_time}
+                      onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-foreground mb-1.5">
+                      Waktu Selesai (Opsional)
+                    </label>
+                    <Input
+                      type="datetime-local"
+                      value={formData.end_time}
+                      onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Bagian 2: Lokasi, Biaya & Pendaftaran */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border shadow-xs space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b border-border/70">
+                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
+                    2. Lokasi, Biaya &amp; Kuota
+                  </h4>
+                </div>
+
+                {/* Lokasi & Tautan Maps/Stream */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-xs font-bold text-foreground mb-1.5">
+                      Nama Lokasi / Ruang <span className="text-destructive">*</span>
+                    </label>
+                    <Input
+                      required
+                      value={formData.location_name}
+                      onChange={(e) => setFormData({ ...formData, location_name: e.target.value })}
+                      placeholder="misal: Auditorium Ki Hadjar Dewantara UST"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-foreground mb-1.5">
+                      Tautan Lokasi / URL Zoom (Opsional)
+                    </label>
+                    <Input
+                      type="url"
+                      value={formData.location_url}
+                      onChange={(e) => setFormData({ ...formData, location_url: e.target.value })}
+                      placeholder="https://maps.app.goo.gl/... atau https://zoom.us/..."
+                    />
+                  </div>
+                </div>
+
+                {/* Biaya, Kuota, Urutan Tampil */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                  <div>
+                    <label className="block text-xs font-bold text-foreground mb-1.5">
+                      Biaya Registrasi (IDR)
+                    </label>
+                    <Input
+                      type="number"
+                      min={0}
+                      step={1000}
+                      value={formData.price}
+                      onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                      placeholder="0 = Gratis"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-foreground mb-1.5">
+                      Kapasitas / Kuota
+                    </label>
+                    <Input
+                      type="number"
+                      min={1}
+                      value={formData.quota}
+                      onChange={(e) => setFormData({ ...formData, quota: Number(e.target.value) })}
+                      placeholder="misal: 250"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-foreground mb-1.5">
+                      Urutan Tampil
+                    </label>
+                    <Input
+                      type="number"
+                      min={1}
+                      value={formData.order_index}
+                      onChange={(e) => setFormData({ ...formData, order_index: Number(e.target.value) })}
+                    />
+                  </div>
+                </div>
+
+                {/* Tautan Pendaftaran Eksternal */}
                 <div>
                   <label className="block text-xs font-bold text-foreground mb-1.5">
-                    Tautan Lokasi / URL Zoom (Opsional)
+                    Tautan Formulir Pendaftaran / Registrasi (Opsional)
                   </label>
                   <Input
                     type="url"
-                    value={formData.location_url}
-                    onChange={(e) => setFormData({ ...formData, location_url: e.target.value })}
-                    placeholder="https://maps.app.goo.gl/... atau https://zoom.us/..."
+                    value={formData.registration_url}
+                    onChange={(e) => setFormData({ ...formData, registration_url: e.target.value })}
+                    placeholder="https://bit.ly/Pendaftaran-Semnas atau tautan Google Form"
                   />
                 </div>
               </div>
 
-              {/* Biaya, Kuota, Link Pendaftaran */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-foreground mb-1.5">
-                    Biaya Registrasi (IDR)
-                  </label>
-                  <Input
-                    type="number"
-                    min={0}
-                    step={1000}
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                    placeholder="0 = Gratis"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-foreground mb-1.5">
-                    Kapasitas / Kuota
-                  </label>
-                  <Input
-                    type="number"
-                    min={1}
-                    value={formData.quota}
-                    onChange={(e) => setFormData({ ...formData, quota: Number(e.target.value) })}
-                    placeholder="misal: 250"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-foreground mb-1.5">
-                    Urutan Tampil
-                  </label>
-                  <Input
-                    type="number"
-                    min={1}
-                    value={formData.order_index}
-                    onChange={(e) => setFormData({ ...formData, order_index: Number(e.target.value) })}
-                  />
-                </div>
-              </div>
-
-              {/* Tautan Pendaftaran Eksternal */}
-              <div>
-                <label className="block text-xs font-bold text-foreground mb-1.5">
-                  Tautan Formulir Pendaftaran / Registrasi (Opsional)
-                </label>
-                <Input
-                  type="url"
-                  value={formData.registration_url}
-                  onChange={(e) => setFormData({ ...formData, registration_url: e.target.value })}
-                  placeholder="https://bit.ly/Pendaftaran-Semnas atau tautan Google Form"
-                />
-              </div>
-
-              {/* Narasumber Dinamis */}
-              <div className="p-3.5 rounded-2xl bg-muted/30 border border-border space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-foreground">
-                    Daftar Pembicara / Narasumber
-                  </label>
+              {/* Bagian 3: Pembicara & Deskripsi */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border shadow-xs space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-border/70">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-sky-500" />
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
+                      3. Narasumber &amp; Ringkasan Materi
+                    </h4>
+                  </div>
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     onClick={addSpeakerRow}
-                    className="text-xs h-7 px-2"
+                    className="text-xs h-7 px-2.5 rounded-lg"
                   >
                     + Tambah Pembicara
                   </Button>
                 </div>
 
-                <div className="space-y-2">
+                {/* Narasumber Dinamis */}
+                <div className="space-y-2.5">
                   {formData.speakers.map((sp, idx) => (
-                    <div key={idx} className="flex items-center gap-2 bg-card p-2 rounded-xl border border-border">
+                    <div key={idx} className="flex items-start sm:items-center gap-2 bg-muted/40 p-2.5 rounded-xl border border-border">
                       <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
                         <Input
                           placeholder="Nama Lengkap & Gelar *"
@@ -767,7 +791,7 @@ export default function AdminEventsPage() {
                       <button
                         type="button"
                         onClick={() => removeSpeakerRow(idx)}
-                        className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors cursor-pointer"
+                        className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors cursor-pointer shrink-0 mt-1 sm:mt-0"
                         title="Hapus Pembicara"
                       >
                         <Trash size={16} />
@@ -775,53 +799,70 @@ export default function AdminEventsPage() {
                     </div>
                   ))}
                 </div>
+
+                {/* Deskripsi */}
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1.5">
+                    Deskripsi &amp; Ringkasan Materi
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Uraikan topik pembahasan, target audiens, dan fasilitas yang didapatkan..."
+                    className="w-full px-3 py-2.5 rounded-xl text-xs bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary leading-relaxed"
+                  />
+                </div>
               </div>
 
-              {/* Deskripsi */}
-              <div>
-                <label className="block text-xs font-bold text-foreground mb-1.5">
-                  Deskripsi &amp; Ringkasan Materi
-                </label>
-                <textarea
-                  rows={3}
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Uraikan topik pembahasan, target audiens, dan fasilitas yang didapatkan..."
-                  className="w-full px-3 py-2 rounded-xl text-xs bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                />
-              </div>
+              {/* Bagian 4: Pengaturan Tambahan & Publikasi */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border shadow-xs space-y-3">
+                <div className="flex items-center gap-2 pb-2 border-b border-border/70">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
+                    4. Sertifikat &amp; Publikasi
+                  </h4>
+                </div>
 
-              {/* Checkbox Opsi Tambahan */}
-              <div className="space-y-2 pt-2">
-                <div className="flex items-center gap-2">
+                <label className="flex items-start gap-3 p-3 rounded-xl bg-muted/40 border border-border cursor-pointer hover:bg-muted/60 transition-colors">
                   <input
                     type="checkbox"
                     id="cert_provided"
                     checked={formData.certificate_provided}
                     onChange={(e) => setFormData({ ...formData, certificate_provided: e.target.checked })}
-                    className="w-4 h-4 rounded text-primary bg-background border-border focus:ring-primary"
+                    className="w-4 h-4 rounded text-primary bg-background border-border focus:ring-primary mt-0.5"
                   />
-                  <label htmlFor="cert_provided" className="text-xs text-foreground cursor-pointer select-none">
-                    Menyediakan E-Sertifikat Nasional berpredikat resmi
-                  </label>
-                </div>
+                  <div className="text-xs select-none">
+                    <span className="font-bold text-foreground block">
+                      Menyediakan E-Sertifikat Nasional
+                    </span>
+                    <span className="text-muted-foreground text-[11px]">
+                      Peserta yang hadir akan mendapatkan e-sertifikat berpredikat resmi dari panitia
+                    </span>
+                  </div>
+                </label>
 
-                <div className="flex items-center gap-2">
+                <label className="flex items-start gap-3 p-3 rounded-xl bg-muted/40 border border-border cursor-pointer hover:bg-muted/60 transition-colors">
                   <input
                     type="checkbox"
                     id="is_pub"
                     checked={formData.is_published}
                     onChange={(e) => setFormData({ ...formData, is_published: e.target.checked })}
-                    className="w-4 h-4 rounded text-primary bg-background border-border focus:ring-primary"
+                    className="w-4 h-4 rounded text-primary bg-background border-border focus:ring-primary mt-0.5"
                   />
-                  <label htmlFor="is_pub" className="text-xs text-foreground cursor-pointer select-none">
-                    <strong>Terbitkan agenda ke publik</strong> (muncul di landing page dan portal informasi)
-                  </label>
-                </div>
+                  <div className="text-xs select-none">
+                    <span className="font-bold text-foreground block">
+                      Publikasikan Agenda ke Publik Sekarang
+                    </span>
+                    <span className="text-muted-foreground text-[11px]">
+                      Jika aktif, agenda akan langsung tampil di landing page, navbar, dan kalender acara
+                    </span>
+                  </div>
+                </label>
               </div>
             </DrawerContent>
 
-            <DrawerFooter className="p-6 border-t border-border flex flex-row items-center justify-end gap-3">
+            <DrawerFooter className="p-4 sm:p-5 border-t border-border flex flex-row items-center justify-end gap-3 bg-card shrink-0">
               <Button
                 type="button"
                 variant="outline"
