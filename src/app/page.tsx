@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { HeroSection } from '@/components/landing/HeroSection';
@@ -12,21 +12,24 @@ import { HowToRegisterSection } from '@/components/landing/HowToRegisterSection'
 import { FaqSection } from '@/components/landing/FaqSection';
 import { CtaClosingSection } from '@/components/landing/CtaClosingSection';
 import { StickyBottomBar } from '@/components/landing/StickyBottomBar';
+import { connection } from 'next/server';
 import { competitionRepository } from '@/lib/repositories';
 import { Competition } from '@/lib/types';
 
-export const instant = false;
+async function CompetitionsDataSection() {
+  await connection();
 
-export default async function HomePage() {
-  // Ambil data kompetisi langsung dari database backend / Supabase
   let competitions: Competition[] = [];
   try {
     competitions = await competitionRepository.getAll();
   } catch {
-    // Graceful fallback ke mock data bila Supabase koneksi offline
     competitions = [];
   }
 
+  return <CompetitionsSection id="lomba" initialCompetitions={competitions} />;
+}
+
+export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#0B0720] text-[#F5F2FF]">
       {/* ── Header / Navbar ── */}
@@ -37,7 +40,9 @@ export default async function HomePage() {
         <HeroSection />
         <CountdownTimer />
         <PartnersSection />
-        <CompetitionsSection id="lomba" initialCompetitions={competitions} />
+        <Suspense fallback={<CompetitionsSection id="lomba" initialCompetitions={[]} />}>
+          <CompetitionsDataSection />
+        </Suspense>
         <TimelineSection id="jadwal" />
         <EventsSection id="agenda" />
         <LeaderboardTeaser />

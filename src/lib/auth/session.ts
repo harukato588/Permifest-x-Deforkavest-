@@ -23,7 +23,7 @@ export async function getCurrentUser(): Promise<AuthSessionUser | null> {
       if (!userRole) {
         if (user.email === 'admin@permifest.id') userRole = 'super_admin';
         else if (user.email === 'panitia@permifest.id') userRole = 'panitia';
-        else if (user.email === 'juri@permifest.id' || user.email?.includes('juri')) userRole = 'juri';
+        else if (user.email === 'juri@permifest.id') userRole = 'juri';
         else userRole = 'peserta';
       }
 

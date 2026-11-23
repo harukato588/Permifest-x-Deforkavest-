@@ -32,7 +32,7 @@ export default function LoginPage() {
         return;
       }
 
-      // Sinkronkan role store demo agar konsisten
+      // Sinkronkan role store dengan role resmi dari server
       const detectedRole = result.data.role;
       if (
         detectedRole === 'peserta' ||
@@ -41,10 +41,6 @@ export default function LoginPage() {
         detectedRole === 'super_admin'
       ) {
         switchRole(detectedRole);
-      } else if (email.includes('juri')) {
-        switchRole('juri');
-      } else if (email.includes('panitia') || email.includes('admin')) {
-        switchRole('panitia');
       } else {
         switchRole('peserta');
       }

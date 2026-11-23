@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { ROLE_LABELS } from '@/lib/constants';
-import { UserRole } from '@/lib/types';
 import {
   House,
   Trophy,
@@ -53,7 +52,7 @@ interface MenuGroup {
 export function Sidebar({ onCloseMobile }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { currentUser, switchRole, logout } = useAppStore();
+  const { currentUser, logout } = useAppStore();
   const handleLogout = async () => {
     await logout();
     router.push('/login');
@@ -140,7 +139,6 @@ export function Sidebar({ onCloseMobile }: SidebarProps) {
   };
 
   const menuGroups = getMenuGroups();
-  const roles: UserRole[] = ['peserta', 'panitia', 'juri', 'super_admin'];
 
   return (
     <aside className="w-64 bg-[var(--card)] border-r border-[var(--border)] flex flex-col h-screen shrink-0 text-[var(--foreground)] transition-colors duration-200">
@@ -175,35 +173,6 @@ export function Sidebar({ onCloseMobile }: SidebarProps) {
             </div>
           </div>
         </div>
-
-        {/* Demo Switcher - Hanya aktif di non-production (T0.6 & AGENTS.md Bagian 11) */}
-        {process.env.NODE_ENV !== 'production' && (
-          <div className="mt-3 pt-3 border-t border-[var(--border)]/70">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[10px] text-[var(--muted-foreground)] font-semibold uppercase tracking-wider">
-                Ganti Role Demo:
-              </span>
-              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[var(--primary)]/10 text-[var(--primary)] font-bold">
-                DEV ONLY
-              </span>
-            </div>
-            <div className="grid grid-cols-2 gap-1.5">
-              {roles.map((r) => (
-                <button
-                  key={r}
-                  type="button"
-                  onClick={() => switchRole(r)}
-                  className={`text-[10px] py-1 px-2 rounded-md text-left transition-colors truncate min-h-[28px] ${currentUser.role === r
-                    ? 'bg-[var(--primary)] text-white font-bold'
-                    : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--accent)]'
-                    }`}
-                >
-                  {ROLE_LABELS[r]}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Navigation Groups */}
