@@ -30,6 +30,7 @@ export interface AuthSessionUser {
   roles: AppRole[];
   institution?: string;
   phone?: string;
+  education_level?: 'mahasiswa' | 'sma_smk' | 'umum' | null;
   avatar_url?: string;
   is_verified?: boolean;
   assurance_level?: 'aal1' | 'aal2' | null;

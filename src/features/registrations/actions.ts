@@ -38,9 +38,40 @@ export async function registerCompetitionAction(
     }
 
     const { competition_id, form_data, team_name, team_members } = parsed.data;
+    if (!user.roles.includes('peserta')) {
+      return { success: false, error: 'Hanya akun peserta yang dapat mendaftar lomba.' };
+    }
 
     // Gunakan admin client supaya bisa membaca kompetisi tanpa RLS user
     const admin = createAdminClient();
+    const { data: profile, error: profileError } = await admin
+      .from('users')
+      .select('education_level')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (profileError || !profile?.education_level) {
+      return {
+        success: false,
+        error: 'Lengkapi status pendidikan di Profil sebelum mendaftar lomba.',
+      };
+    }
+
+    if (profile.education_level === 'mahasiswa') {
+      const { data: ktm, error: ktmError } = await admin
+        .from('identity_verifications')
+        .select('status')
+        .eq('user_id', user.id)
+        .eq('document_type', 'ktm')
+        .maybeSingle();
+
+      if (ktmError || !ktm || !['pending', 'verified'].includes(ktm.status)) {
+        return {
+          success: false,
+          error: 'Mahasiswa wajib mengunggah KTM di Profil sebelum mendaftar lomba.',
+        };
+      }
+    }
 
     // 1. Validasi kompetisi tersedia & cek window pendaftaran
     const { data: comp, error: compErr } = await admin

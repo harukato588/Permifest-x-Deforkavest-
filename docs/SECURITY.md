@@ -9,7 +9,7 @@ Temanya Cybersecurity: anggap peserta akan menguji sistem. PRD bagian 3 dan 8 ad
 | Nilai juri | Diubah setelah kunci; dilihat peserta | Trigger `guard_locked_scores`, RLS tanpa akses peserta, `score_changes`, audit |
 | Bukti bayar, identitas | IDOR, bucket publik | Bucket privat, path berisi `user_id`, RLS storage, signed URL singkat |
 | Role | Eskalasi (kirim `role=super_admin`, ubah metadata/cookie) | Trigger `handle_new_user`, sesi membaca role dari `user_roles`, guard server + RLS, perubahan role hanya super admin |
-| Karya peserta | Dibaca peserta lain / juri tak ditugaskan | RLS per `assigned`, tanpa listing publik |
+| Karya peserta | Dibaca peserta lain / juri tak ditugaskan; identitas terlihat dalam penilaian | RLS per `assigned`, unduhan karya diverifikasi lewat sesi/RLS, tampilan juri memakai ID anonim dan tidak memuat KTM |
 | Upload | Malware, file ganda ekstensi, XSS lewat nama/SVG | Whitelist MIME + ekstensi, cek magic bytes saat konfirmasi, nama uuid, `Content-Disposition: attachment`, tanpa SVG/HTML |
 | Sesi | XSS/CSRF/session fixation | Cookie HttpOnly/Secure/SameSite, CSP, escaping, Server Action dengan origin check |
 | Login/registrasi | Brute force, enumerasi akun, spam | Rate limit (Vercel Firewall/middleware), pesan error seragam, CAPTCHA bila perlu |
@@ -29,6 +29,7 @@ Temanya Cybersecurity: anggap peserta akan menguji sistem. PRD bagian 3 dan 8 ad
 - [ ] Semua tabel `enable row level security`; uji penolakan per peran (lihat TESTING).
 - [ ] Setiap Server Action memanggil `requirePermission`. Tidak ada endpoint yang hanya mengandalkan UI.
 - [ ] Parameter id (`registrationId`, `submissionId`) selalu dicek kepemilikan/scope; tidak percaya klien.
+- [ ] Uji bahwa juri hanya membuka penugasan sendiri dan tidak menerima identitas atau KTM pada halaman penilaian.
 - [ ] `SUPABASE_SERVICE_ROLE_KEY` hanya di `lib/supabase/admin.ts` (`server-only`).
 
 **Upload**

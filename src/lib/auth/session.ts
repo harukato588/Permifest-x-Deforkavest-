@@ -28,7 +28,7 @@ export async function getCurrentUser(): Promise<AuthSessionUser | null> {
 
   const { data: profileData, error: profileError } = await supabase
     .from('users')
-    .select('full_name, institution, phone, avatar_url')
+    .select('full_name, institution, phone, avatar_url, education_level')
     .eq('id', user.id)
     .maybeSingle();
 
@@ -41,6 +41,7 @@ export async function getCurrentUser(): Promise<AuthSessionUser | null> {
       institution: z.string().nullable(),
       phone: z.string().nullable(),
       avatar_url: z.string().nullable(),
+      education_level: z.enum(['mahasiswa', 'sma_smk', 'umum']).nullable(),
     })
     .safeParse(profileData);
 
@@ -85,6 +86,7 @@ export async function getCurrentUser(): Promise<AuthSessionUser | null> {
     roles,
     institution: profile.data.institution || '',
     phone: profile.data.phone || '',
+    education_level: profile.data.education_level,
     avatar_url: profile.data.avatar_url || '',
     is_verified: Boolean(user.email_confirmed_at),
     assurance_level: assuranceLevel,
@@ -148,6 +150,7 @@ export function toAppUser(user: AuthSessionUser) {
     role: user.role,
     institution: user.institution,
     phone: user.phone,
+    education_level: user.education_level,
     avatar_url: user.avatar_url,
     email_verified: user.is_verified ?? false,
   };

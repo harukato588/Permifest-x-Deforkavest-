@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+export const EducationLevelSchema = z.enum(['mahasiswa', 'sma_smk', 'umum'], {
+  message: 'Pilih status pendidikan kamu.',
+});
+
 export const NewPasswordSchema = z
   .string()
   .min(8, 'Password minimal 8 karakter.')
@@ -86,6 +90,7 @@ export const ProfileSchema = z.object({
     .trim()
     .max(20, 'Nomor telepon maksimal 20 karakter')
     .regex(/^[0-9+-\s]*$/, 'Format nomor telepon tidak valid'),
+  educationLevel: EducationLevelSchema.optional(),
 });
 
 export type LoginInput = z.infer<typeof LoginSchema>;
@@ -94,3 +99,4 @@ export type ForgotPasswordInput = z.infer<typeof ForgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof ResetPasswordSchema>;
 export type ChangePasswordInput = z.infer<typeof ChangePasswordSchema>;
 export type ProfileInput = z.infer<typeof ProfileSchema>;
+export type EducationLevel = z.infer<typeof EducationLevelSchema>;

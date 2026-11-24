@@ -18,10 +18,10 @@ Konvensi: PK `id uuid default gen_random_uuid()`; `created_at/updated_at timesta
 ### A. Pengguna dan akses
 | Tabel | Kolom penting | Constraint |
 |---|---|---|
-| `users` | `id` (= `auth.users.id`), `full_name`, `institution`, `phone`, `education_level`, `deleted_at` | PK = FK auth |
+| `users` | `id` (= `auth.users.id`), `full_name`, `institution`, `phone`, `education_level`, `deleted_at` | PK = FK auth; `education_level` dikunci setelah pendaftaran pertama dan hanya dapat dikoreksi super admin |
 | `roles` | `id`, `key app_role`, `label` | unique `key`; seed 4 baris |
 | `user_roles` | `user_id`, `role_id`, `competition_id null`, `granted_by`, `granted_at` | unique `(user_id, role_id, competition_id)`; `competition_id null` = semua lomba; super_admin selalu null |
-| `identity_verifications` | `user_id`, `document_type`, `storage_path`, `status`, `reviewed_by`, `reviewed_at`, `note` | opsional per lomba |
+| `identity_verifications` | `user_id`, `document_type`, `storage_path`, `status`, `reviewed_by`, `reviewed_at`, `note` | satu KTM per pengguna; juri tidak mendapat akses; panitia dibatasi scope lomba |
 
 ### B. Event dan lomba
 | Tabel | Kolom penting | Constraint |
@@ -31,7 +31,9 @@ Konvensi: PK `id uuid default gen_random_uuid()`; `created_at/updated_at timesta
 | `competitions` | `event_id`, `theme_id`, `slug`, `name`, `kind`, `participation`, `description`, `fee_idr null`, `quota null`, `team_min/team_max/reserve_max null`, `requires_identity bool`, `registration_opens_at`, `registration_closes_at`, `form_fields jsonb`, `submission_config jsonb`, `scoring_config jsonb`, `is_published bool`, `created_by` | unique `slug`; `opens < closes` |
 | `stages` | `competition_id`, `key` (`penyisihan`/`final`), `name`, `position`, `starts_at`, `submission_deadline`, `ends_at`, `scores_locked_at null`, `scores_locked_by null`, `results_published_at null` | unique `(competition_id, position)` |
 
-`scoring_config` (semua configurable, belum diputuskan): `{ "judges_per_submission": 2, "blind": false, "aggregation": "mean" | "weighted_mean" | "trimmed_mean" }`.
+`scoring_config` (semua configurable, belum diputuskan): `{ "judges_per_submission": 2, "aggregation": "mean" | "weighted_mean" | "trimmed_mean" }`.
+
+Tampilan juri hanya memuat karya yang ditugaskan, dengan ID anonim. Nama, kontak, institusi, dan dokumen identitas peserta tidak dikirim ke komponen juri.
 `submission_config`: `{ "accepts": ["pdf","docx"], "max_mb": 15, "link_type": "figma", "allow_separate_diagram": true }`.
 `form_fields`: array `{ key, label, type, required, options?, help?, visible_if? }`.
 

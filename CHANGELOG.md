@@ -5,6 +5,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/). Versi: SemV
 ## [Unreleased]
 
 ### Added
+- Profil peserta memuat status pendidikan dan alur unggah KTM privat. Mahasiswa perlu mengunggah KTM sebelum mendaftar, sementara koreksi status setelah pendaftaran pertama hanya dapat dilakukan super admin.
+- Dashboard juri membaca penugasan dari Supabase, menyamarkan identitas peserta, serta membatasi unduhan karya ke penugasan milik juri. Form penyimpanan skor belum tersambung ke Supabase.
 - Penguatan autentikasi dan role: menghapus role-switcher, mengambil profil dan role dari Supabase, menolak akses dashboard lintas role, menambahkan MFA wajib untuk Super Admin, serta menyediakan script provisioning akun demo yang hanya menerima Supabase lokal.
 - Seeder demo menolak email Auth yang dipakai akun tanpa `app_metadata.permifest_demo=true`; seeding ulang hanya memperbarui akun demo yang ditandai.
 - Profil kini disimpan melalui sesi pengguna; validasi password baru dipakai pada registrasi, reset, dan perubahan password. Password lama tetap dapat dipakai untuk login.

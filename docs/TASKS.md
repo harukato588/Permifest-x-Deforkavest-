@@ -55,7 +55,7 @@ Script provisioning T1.6 sudah tersedia, tetapi belum dijalankan karena Supabase
 | T3.1 | Upload karya: signed URL, versi, deadline, validasi Figma | Versi terakhir aktif; tolak setelah deadline | T2.6 | [x] |
 | T3.2 | Editor rubrik (bobot total 100) | Publikasi ditolak bila bobot tak 100 | T2.1 | [x] |
 | T3.3 | Penugasan juri + cek benturan instansi (konfigurasi) | Juri tak ditugaskan tak bisa membaca karya | T3.1 | [x] |
-| T3.4 | Juri: penugasan, viewer, form rubrik, kirim | Skor dalam batas; draf tersimpan | T3.3 | [x] |
+| T3.4 | Juri: penugasan, viewer anonim, form rubrik, kirim | Penugasan dan viewer tersambung ke Supabase; skor dan draf harus tersimpan ke database | T3.3 | [~] |
 | T3.5 | Monitoring penilaian + kunci nilai | Setelah kunci, juri dan panitia tak bisa ubah | T3.4 | [x] |
 | T3.6 | `v_final_scores` dengan agregasi dari konfigurasi | Hasil sama dengan perhitungan manual uji | T3.5 | [x] |
 | T3.7 | Input hasil PES/ML | `unique(placement)` ditegakkan | T2.6 | [x] |
