@@ -39,11 +39,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/). Versi: SemV
   - Tanya Jawab (`FaqSection.tsx` & `src/app/informasi/page.tsx`): Pertanyaan dan jawaban FAQ serta kontak sekretariat membaca langsung dari state `faqs` dan `systemSettings` terpusat.
 
 ### Fixed
+<<<<<<< HEAD
 - Penghapusan Role Switcher Demo & Pengetatan Akses Hak Peran:
   - Menghapus komponen demo role-switcher ("Ganti Role Demo: DEV ONLY") pada Sidebar dashboard (`src/components/layout/sidebar.tsx`) sehingga pengguna/peserta tidak dapat lagi mengganti peran secara bebas ke panitia, juri, atau super admin.
   - Memperketat `AdminAreaLayout` (`/dashboard/admin`), `JuriAreaLayout` (`/dashboard/juri`), dan `PesertaAreaLayout` (`/dashboard/peserta`) untuk selalu memvalidasi peran pengguna dari sesi server sebelum merender konten, dan mengarahkan otomatis (*redirect*) pengguna yang tidak berwenang kembali ke dashboard peserta.
   - Memperbaiki rekursi RLS pada relasi `team_members` di database Supabase dengan fungsi `is_team_member` bertipe `SECURITY DEFINER` (`20261124000001_fix_team_members_rls_recursion.sql`).
   - Mengamankan query admin `getAllSubmissionsForAdminQuery` agar menggunakan `createAdminClient()` di sisi server setelah verifikasi izin `submissions.read`.
+=======
+- Navbar: Agenda Seminar tetap tampil di desktop, agenda kosong mempertahankan target `#agenda`, dan penanda Guidebook mengikuti halaman aktif di navbar mobile.
+>>>>>>> d43eafe (fix: restore public navbar navigation)
 - Audit pra-deployment:
   - Perbaikan 2 error ESLint dan 4 warning: penggantian `any` type pada `src/app/informasi/page.tsx`, perbaikan cascading `setState` dalam effect `src/components/guidebook/PdfViewerModal.tsx` dengan pembungkusan `useCallback`, pembersihan dependensi dan variabel tidak terpakai di `src/components/landing/CompetitionsSection.tsx`, dan penambahan metadata berkas di `src/app/guidebook/page.tsx`.
   - Pengamanan mutlak akun demo dan injeksi cookie demo (`src/features/auth/actions.ts`, `src/proxy.ts`, `src/lib/auth/session.ts`) agar tidak dapat disalahgunakan di lingkungan produksi (hanya aktif di development atau saat flag `NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS=true` sengaja disetel).

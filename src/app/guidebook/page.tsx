@@ -82,7 +82,7 @@ export default function PublicGuidebookPage() {
         }}
       />
 
-      <Navbar />
+      <Navbar activePage="guidebook" />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 md:pt-28 relative z-10 w-full">
         {/* ── Page Header ── */}
