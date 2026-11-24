@@ -19,6 +19,8 @@ Tiga bagian: **A** catatan keputusan (ADR), **B** rekonsiliasi PRD vs laporan pr
 | ADR-011 | Nama resmi **Permifest x Deforkafest** (F) | Arahan pemilik; PRD menulis "Devorkafest" | Accepted; PRD perlu dikoreksi |
 | ADR-012 | Leaderboard hanya menampilkan data yang dirilis; mode via konfigurasi | Peserta hanya boleh melihat hasil akhir (PRD 3, 5.5) vs arahan "live" | Proposed, lihat C-09 |
 | ADR-013 | Super admin wajib 2FA, jumlah dibatasi | PRD 3.2 | Accepted |
+| ADR-014 | Role sesi dibaca dari database; tidak ada role-switcher klien | Cookie dan metadata klien bukan sumber otorisasi | Accepted |
+| ADR-015 | Akun demo diprovisikan hanya ke Supabase lokal dari `.env.local` | Mencegah pembuatan akun demo di layanan bersama/production dan menjaga password dari repo | Accepted |
 
 ## B. Rekonsiliasi dan temuan audit
 
@@ -53,6 +55,8 @@ Tiga bagian: **A** catatan keputusan (ADR), **B** rekonsiliasi PRD vs laporan pr
 | Sedang | Dua pustaka ikon, UI belum seragam | Inkonsistensi | T0.7, T0.8 |
 | Rendah | Versi dan plugin Tailwind/Next belum diverifikasi (mis. `@tailwindcss/turbopack`) | Build rapuh | T0.9 |
 | Rendah | Perubahan uncommitted di `yuum` | Risiko hilang | T0.1 |
+
+Temuan audit tentang role-switcher, sumber role, guard dashboard, role signup, dan 2FA ditangani pada Tahap 2. Uji matriks RLS dan provisioning akun demo lokal tetap perlu dijalankan.
 
 ## C. Pertanyaan terbuka -> konfigurasi
 

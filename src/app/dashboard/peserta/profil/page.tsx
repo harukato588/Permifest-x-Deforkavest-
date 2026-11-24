@@ -6,9 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useAppStore } from '@/lib/store';
 import { ROLE_LABELS } from '@/lib/constants';
 import { CheckCircle, ShieldCheck } from '@phosphor-icons/react';
+import { updateProfileAction } from '@/features/users/actions';
 
 export default function PesertaProfilPage() {
   const { currentUser, setCurrentUser } = useAppStore();
@@ -17,17 +19,28 @@ export default function PesertaProfilPage() {
   const [institution, setInstitution] = useState(currentUser.institution || '');
   const [phone, setPhone] = useState(currentUser.phone || '');
   const [saved, setSaved] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setCurrentUser({
-      ...currentUser,
-      full_name: fullName,
-      institution: institution,
-      phone: phone,
-    });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    setSaved(false);
+    setErrorMessage(null);
+    setIsSaving(true);
+    try {
+      const result = await updateProfileAction({ fullName, institution, phone });
+      if (!result.success || !result.data) {
+        setErrorMessage(result.message || 'Profil gagal disimpan. Coba lagi.');
+        return;
+      }
+      setCurrentUser({ ...currentUser, ...result.data });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch {
+      setErrorMessage('Profil gagal disimpan. Periksa koneksi lalu coba lagi.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -44,6 +57,12 @@ export default function PesertaProfilPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSave} className="space-y-4">
+              {errorMessage && (
+                <Alert variant="destructive" role="alert">
+                  <AlertTitle>Gagal menyimpan profil</AlertTitle>
+                  <AlertDescription>{errorMessage}</AlertDescription>
+                </Alert>
+              )}
               
               <div className="flex items-center gap-4 pb-4 border-b border-border">
                 <div className="w-16 h-16 rounded-full bg-primary/20 border border-primary/40 text-primary font-bold text-2xl flex items-center justify-center">
@@ -95,7 +114,7 @@ export default function PesertaProfilPage() {
                     Profil berhasil disimpan!
                   </span>
                 )}
-                <Button type="submit" variant="primary" className="ml-auto">
+                <Button type="submit" variant="primary" className="ml-auto" isLoading={isSaving}>
                   Simpan Perubahan
                 </Button>
               </div>

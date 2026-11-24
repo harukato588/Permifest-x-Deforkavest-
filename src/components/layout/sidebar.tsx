@@ -53,9 +53,15 @@ export function Sidebar({ onCloseMobile }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { currentUser, logout } = useAppStore();
+  const [logoutError, setLogoutError] = React.useState<string | null>(null);
   const handleLogout = async () => {
-    await logout();
-    router.push('/login');
+    setLogoutError(null);
+    try {
+      await logout();
+      router.push('/login');
+    } catch {
+      setLogoutError('Sesi belum berhasil diakhiri. Periksa koneksi lalu coba lagi.');
+    }
   };
 
   const getMenuGroups = (): MenuGroup[] => {
@@ -215,6 +221,11 @@ export function Sidebar({ onCloseMobile }: SidebarProps) {
 
       {/* Footer Info & Tombol Logout Nyata */}
       <div className="p-3 border-t border-[var(--border)] text-[11px] text-[var(--muted-foreground)] flex items-center justify-between">
+        {logoutError && (
+          <span role="alert" className="text-[var(--destructive)]">
+            {logoutError}
+          </span>
+        )}
         <button
           type="button"
           onClick={handleLogout}

@@ -1,26 +1,16 @@
-'use client';
+import { connection } from 'next/server';
+import { redirect } from 'next/navigation';
+import { getCurrentUser } from '@/lib/auth/session';
+import { getDashboardPath } from '@/lib/auth/roles';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAppStore } from '@/lib/store';
+export const instant = false;
 
-export default function DashboardIndexPage() {
-  const router = useRouter();
-  const { currentUser } = useAppStore();
-
-  useEffect(() => {
-    if (currentUser.role === 'peserta') {
-      router.replace('/dashboard/peserta');
-    } else if (currentUser.role === 'juri') {
-      router.replace('/dashboard/juri');
-    } else {
-      router.replace('/dashboard/admin');
-    }
-  }, [currentUser, router]);
-
-  return (
-    <div className="min-h-screen bg-[#090d16] flex items-center justify-center text-cyan-400 font-mono text-sm">
-      Mengalihkan ke Dashboard {currentUser.role.toUpperCase()}...
-    </div>
-  );
+export default async function DashboardIndexPage() {
+  await connection();
+  const user = await getCurrentUser();
+  if (!user) redirect('/login?redirect=%2Fdashboard');
+  if (user.roles.includes('super_admin') && user.assurance_level !== 'aal2') {
+    redirect('/mfa');
+  }
+  redirect(getDashboardPath(user.role));
 }

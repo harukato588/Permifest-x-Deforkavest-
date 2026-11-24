@@ -5,6 +5,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/). Versi: SemV
 ## [Unreleased]
 
 ### Added
+- Penguatan autentikasi dan role: menghapus role-switcher, mengambil profil dan role dari Supabase, menolak akses dashboard lintas role, menambahkan MFA wajib untuk Super Admin, serta menyediakan script provisioning akun demo yang hanya menerima Supabase lokal.
+- Seeder demo menolak email Auth yang dipakai akun tanpa `app_metadata.permifest_demo=true`; seeding ulang hanya memperbarui akun demo yang ditandai.
+- Profil kini disimpan melalui sesi pengguna; validasi password baru dipakai pada registrasi, reset, dan perubahan password. Password lama tetap dapat dipakai untuk login.
 - Modul Pengumpulan Karya Peserta (Submission - T3.1):
   - Modul domain `src/features/submissions/` dengan validasi Zod (`schema.ts`), queries database server-side (`queries.ts`), dan Server Action `submitWorkAction` (`actions.ts`).
   - Penegakan integritas server-side: verifikasi kepemilikan registrasi, pengecekan status pendaftaran terverifikasi, validasi deadline tahapan lomba, penomoran versi otomatis (`version = 1, 2, ...` & `is_latest`), serta pencatatan ke `audit_logs`.

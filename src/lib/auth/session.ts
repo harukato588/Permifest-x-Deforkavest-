@@ -1,101 +1,158 @@
 import 'server-only';
 
-import { cookies } from 'next/headers';
+import { connection } from 'next/server';
+import { redirect } from 'next/navigation';
+import { z } from 'zod';
 import { createClient as createServerSupabase } from '@/lib/supabase/server';
+import { isSupabaseLive } from '@/lib/supabase/status';
 import { AuthSessionUser, AppRole, AppPermission } from './types';
-import { hasPermission } from './permissions';
+import {
+  AppRoleSchema,
+  canAccessRoleArea,
+  getDashboardPath,
+  getPrimaryRole,
+  requiresSuperAdminMfa,
+} from './roles';
+import { hasUserPermission } from './permissions';
 
-/**
- * Mendapatkan pengguna yang sedang login dari sesi cookie Supabase atau sesi demo terotentikasi.
- * Mengembalikan null jika belum terautentikasi.
- */
 export async function getCurrentUser(): Promise<AuthSessionUser | null> {
-  try {
-    const supabase = await createServerSupabase();
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
+  if (!isSupabaseLive()) return null;
 
-    if (!error && user) {
-      // Role default adalah 'peserta' sesuai Golden Rule #3, kecuali akun resmi panitia/juri/admin
-      let userRole = (user.user_metadata?.role as AppRole);
-      if (!userRole) {
-        if (user.email === 'admin@permifest.id') userRole = 'super_admin';
-        else if (user.email === 'panitia@permifest.id') userRole = 'panitia';
-        else if (user.email === 'juri@permifest.id') userRole = 'juri';
-        else userRole = 'peserta';
-      }
+  const supabase = await createServerSupabase();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
-      return {
-        id: user.id,
-        email: user.email || '',
-        full_name: user.user_metadata?.full_name || (userRole === 'super_admin' ? 'Super Admin' : user.email?.split('@')[0]) || 'Pengguna',
-        role: userRole,
-        institution: user.user_metadata?.institution || '',
-        phone: user.user_metadata?.phone || '',
-        avatar_url: user.user_metadata?.avatar_url || '',
-        is_verified: Boolean(user.email_confirmed_at),
-      };
-    }
-  } catch {
-    // Abaikan jika Supabase cloud belum siap/koneksi terputus
+  if (authError || !user?.email) return null;
+
+  const { data: profileData, error: profileError } = await supabase
+    .from('users')
+    .select('full_name, institution, phone, avatar_url')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (profileError) throw new Error('Unable to load the authenticated user profile.');
+  if (!profileData) return null;
+
+  const profile = z
+    .object({
+      full_name: z.string().min(1),
+      institution: z.string().nullable(),
+      phone: z.string().nullable(),
+      avatar_url: z.string().nullable(),
+    })
+    .safeParse(profileData);
+
+  if (!profile.success) throw new Error('The authenticated user profile is invalid.');
+
+  const { data: assignments, error: assignmentsError } = await supabase
+    .from('user_roles')
+    .select('role_id')
+    .eq('user_id', user.id);
+
+  if (assignmentsError) throw new Error('Unable to load the authenticated user roles.');
+  if (!assignments.length) return null;
+
+  const { data: roleRows, error: rolesError } = await supabase
+    .from('roles')
+    .select('key')
+    .in('id', assignments.map((assignment) => assignment.role_id));
+
+  if (rolesError) throw new Error('Unable to resolve the authenticated user roles.');
+
+  const roles = [...new Set(roleRows.map((row) => AppRoleSchema.parse(row.key)))];
+  const role = getPrimaryRole(roles);
+  if (!role) return null;
+
+  let assuranceLevel: AuthSessionUser['assurance_level'] = null;
+  if (roles.includes('super_admin')) {
+    const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (error) throw new Error('Unable to verify the Super Admin authentication level.');
+    assuranceLevel =
+      data.currentLevel === 'aal2'
+        ? 'aal2'
+        : data.currentLevel === 'aal1'
+          ? 'aal1'
+          : null;
   }
 
-  // Fallback ke sesi cookie terotentikasi bila ada cookie role yang sah
-  try {
-    const cookieStore = await cookies();
-    const demoRoleCookie = cookieStore.get('permifest_demo_role')?.value as AppRole | undefined;
-    const demoEmailCookie = cookieStore.get('permifest_demo_email')?.value || `${demoRoleCookie || 'peserta'}@permifest.id`;
-
-    if (demoRoleCookie && ['peserta', 'juri', 'panitia', 'super_admin'].includes(demoRoleCookie)) {
-      return {
-        id: `demo-${demoRoleCookie}-id`,
-        email: demoEmailCookie,
-        full_name: demoRoleCookie === 'super_admin' ? 'Super Admin Permifest' : demoRoleCookie.toUpperCase(),
-        role: demoRoleCookie,
-        institution: 'Universitas Sarjanawiyata Tamansiswa',
-        phone: '08123456789',
-        avatar_url: '',
-        is_verified: true,
-      };
-    }
-  } catch {
-    // Abaikan
-  }
-
-  return null;
+  return {
+    id: user.id,
+    email: user.email,
+    full_name: profile.data.full_name,
+    role,
+    roles,
+    institution: profile.data.institution || '',
+    phone: profile.data.phone || '',
+    avatar_url: profile.data.avatar_url || '',
+    is_verified: Boolean(user.email_confirmed_at),
+    assurance_level: assuranceLevel,
+  };
 }
 
-/**
- * Mengharuskan pengguna sudah login. Melempar error atau mengembalikan user.
- */
 export async function requireUser(): Promise<AuthSessionUser> {
   const user = await getCurrentUser();
   if (!user) {
     throw new Error('UNAUTHORIZED: Anda harus masuk terlebih dahulu.');
   }
+  if (requiresSuperAdminMfa(user.roles, user.assurance_level)) {
+    throw new Error('MFA_REQUIRED: Super Admin must complete multi-factor authentication.');
+  }
   return user;
 }
 
-/**
- * Mengharuskan pengguna memiliki salah satu role yang diizinkan.
- */
 export async function requireRole(allowedRoles: AppRole[]): Promise<AuthSessionUser> {
   const user = await requireUser();
-  if (!allowedRoles.includes(user.role)) {
+  if (!canAccessRoleArea(user.roles, allowedRoles)) {
     throw new Error(`FORBIDDEN: Peran ${user.role} tidak memiliki hak akses ke halaman ini.`);
   }
   return user;
 }
 
-/**
- * Mengharuskan pengguna memiliki izin tertentu.
- */
 export async function requirePermission(permission: AppPermission): Promise<AuthSessionUser> {
   const user = await requireUser();
-  if (!hasPermission(user.role, permission)) {
+  if (!hasUserPermission(user, permission)) {
     throw new Error(`FORBIDDEN: Anda tidak memiliki izin "${permission}".`);
   }
   return user;
+}
+
+export async function requireDashboardUser(
+  allowedRoles: AppRole[],
+  dashboardPath: string
+): Promise<AuthSessionUser> {
+  await connection();
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirectToLogin(dashboardPath);
+  }
+
+  if (requiresSuperAdminMfa(user.roles, user.assurance_level)) {
+    redirect('/mfa');
+  }
+
+  if (!canAccessRoleArea(user.roles, allowedRoles)) {
+    redirect(getDashboardPath(user.role));
+  }
+
+  return user;
+}
+
+export function toAppUser(user: AuthSessionUser) {
+  return {
+    id: user.id,
+    email: user.email,
+    full_name: user.full_name,
+    role: user.role,
+    institution: user.institution,
+    phone: user.phone,
+    avatar_url: user.avatar_url,
+    email_verified: user.is_verified ?? false,
+  };
+}
+
+function redirectToLogin(dashboardPath: string): never {
+  redirect(`/login?redirect=${encodeURIComponent(dashboardPath)}`);
 }

@@ -8,12 +8,10 @@ import { Footer } from '@/components/layout/footer';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { SakugaButton } from '@/components/ui/sakuga-button';
-import { useAppStore } from '@/lib/store';
 import { loginAction } from '@/features/auth/actions';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { switchRole } = useAppStore();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,19 +28,6 @@ export default function LoginPage() {
       if (!result.success || !result.data) {
         setErrorMessage(result.message || 'Gagal masuk akun. Periksa email dan password.');
         return;
-      }
-
-      // Sinkronkan role store dengan role resmi dari server
-      const detectedRole = result.data.role;
-      if (
-        detectedRole === 'peserta' ||
-        detectedRole === 'juri' ||
-        detectedRole === 'panitia' ||
-        detectedRole === 'super_admin'
-      ) {
-        switchRole(detectedRole);
-      } else {
-        switchRole('peserta');
       }
 
       router.push(result.data.redirectUrl);
@@ -179,11 +164,6 @@ export default function LoginPage() {
                 </SakugaButton>
               </div>
 
-<<<<<<< HEAD
-=======
-              {/* Quick One-Click Demo Accounts Selector (Hanya Tampil di Non-Production / Dev Mode) */}
-
->>>>>>> a499197 (fix(auth): remove demo account selector)
               <div className="text-center text-xs text-[#A99FD1] pt-3 border-t border-[#2E2266]/80">
                 Belum punya akun?{' '}
                 <Link href="/register" className="text-[#F5F2FF] font-bold hover:text-[#9B6BF2] transition-colors underline">

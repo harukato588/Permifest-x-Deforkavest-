@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { 
   User, 
   UserRole, 
@@ -58,7 +58,6 @@ const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
 interface AppContextType {
   currentUser: User;
   setCurrentUser: (user: User) => void;
-  switchRole: (role: UserRole) => void;
   availableUsers: User[];
   competitions: Competition[];
   registrations: Registration[];
@@ -165,10 +164,14 @@ const GUEST_USER: User = {
   email_verified: false,
 };
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
-  // Always start with GUEST_USER so SSR and client initial render match (prevents hydration mismatch).
-  // Browser storage is read in a useEffect below, which only runs on the client after mount.
-  const [currentUser, setCurrentUser] = useState<User>(GUEST_USER);
+export function AppProvider({
+  children,
+  initialUser,
+}: {
+  children: React.ReactNode;
+  initialUser?: User;
+}) {
+  const [currentUser, setCurrentUser] = useState<User>(initialUser || GUEST_USER);
   const [availableUsers, setAvailableUsers] = useState<User[]>([]);
   const [competitions, setCompetitions] = useState<Competition[]>(INITIAL_COMPETITIONS);
   const [registrations, setRegistrations] = useState<Registration[]>(MOCK_REGISTRATIONS);
@@ -186,68 +189,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [events, setEvents] = useState<EventItem[]>(MOCK_EVENTS);
   const [faqs, setFaqs] = useState<DynamicFaqItem[]>(MOCK_FAQS);
 
-  // Hydrate dari browser storage setelah mount (client only) — mencegah SSR hydration mismatch.
-  // setState di dalam mount-only useEffect adalah pola resmi React untuk client-side hydration.
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    try {
-      // 1. Prioritaskan cookie demo role
-      const matchRole = document.cookie.match(/permifest_demo_role=([^;]+)/);
-      const matchEmail = document.cookie.match(/permifest_demo_email=([^;]+)/);
-      if (matchRole && matchRole[1]) {
-        const roleFromCookie = decodeURIComponent(matchRole[1]) as UserRole;
-        const emailFromCookie = matchEmail ? decodeURIComponent(matchEmail[1]) : `${roleFromCookie}@permifest.id`;
-        setCurrentUser({
-          id: `user-${roleFromCookie}`,
-          email: emailFromCookie,
-          full_name: roleFromCookie === 'super_admin' ? 'Administrator Utama' : roleFromCookie.toUpperCase(),
-          role: roleFromCookie,
-          email_verified: true,
-        });
-        return;
-      }
-      // 2. Baca dari localStorage
-      const saved = localStorage.getItem('permifest_user');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && parsed.role) setCurrentUser(parsed);
-      }
-    } catch {}
-  }, []); // mount-only: runs once on client after hydration
-  /* eslint-enable react-hooks/set-state-in-effect */
-
-  // Simpan setiap kali currentUser berubah
-  useEffect(() => {
-    if (typeof window !== 'undefined' && currentUser && currentUser.role) {
-      try {
-        localStorage.setItem('permifest_user', JSON.stringify(currentUser));
-      } catch {}
-    }
-  }, [currentUser]);
-
-  // Switch role easily for demo & testing
-  const switchRole = (role: UserRole) => {
-    const userForRole = availableUsers.find(u => u.role === role) || {
-      id: `mock-${role}`,
-      email: `${role}@permifest.id`,
-      full_name: `Demo ${role.toUpperCase()}`,
-      role: role,
-      email_verified: true,
-    };
-    setCurrentUser(userForRole);
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('permifest_user', JSON.stringify(userForRole));
-      } catch {}
-    }
-  };
-
   // Logout menyeluruh: reset state client, panggil API logout server, dan redirect ke /login
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' }).catch(() => { });
+      const response = await fetch('/api/auth/logout', { method: 'POST' });
+      if (!response.ok) throw new Error('Gagal mengakhiri sesi.');
     } catch {
-      // Abaikan bila offline
+      throw new Error('Gagal mengakhiri sesi. Periksa koneksi lalu coba lagi.');
     }
     setCurrentUser({
       id: '',
@@ -258,8 +206,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
     if (typeof window !== 'undefined') {
       localStorage.removeItem('permifest_user');
-      document.cookie = 'permifest_demo_role=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-      document.cookie = 'permifest_demo_email=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     }
   };
 
@@ -928,7 +874,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     <AppContext.Provider value={{
       currentUser,
       setCurrentUser,
-      switchRole,
       availableUsers,
       competitions,
       registrations,

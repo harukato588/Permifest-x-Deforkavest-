@@ -1,6 +1,6 @@
-# Permifest × Devorkafest 2026 — Platform Kompetisi Terpadu
+# Permifest x Deforkafest 2026 - Platform Kompetisi Terpadu
 
-Platform web satu pintu untuk mengelola kompetisi di event **Permifest × Devorkafest 2026** bertema **Cybersecurity**. Dibangun sesuai spesifikasi **PRD Draft v2** dengan integrasi pendaftaran mandiri, pembayaran QRIS, submission karya, penilaian rubrik juri terstruktur, dan turnamen e-sport.
+Platform web satu pintu untuk mengelola kompetisi di event **Permifest x Deforkafest 2026** bertema **Cybersecurity**. Dibangun sesuai spesifikasi **PRD Draft v2** dengan integrasi pendaftaran mandiri, pembayaran QRIS, submission karya, penilaian rubrik juri terstruktur, dan turnamen e-sport.
 
 ---
 
@@ -11,7 +11,7 @@ Platform web satu pintu untuk mengelola kompetisi di event **Permifest × Devork
 - **Dewan Juri**: Lembar penilaian khusus karya yang ditugaskan, formulir penilaian rubrik interaktif dengan perhitungan bobot otomatis (*live weighted score*), pencatatan komentar kriteria, penguncian nilai.
 - **Panitia / Admin**: Verifikasi bukti pembayaran (*approve/reject* disertai alasan), manajemen kuota & biaya lomba, penugasan juri ke karya, input skor pertandingan PES & Mobile Legends, rilis pengumuman resmi.
 - **Super Admin**: Jalur darurat dengan audit trail lengkap (*immutable log*), konfigurasi rubrik & form dinamis.
-- **Fitur Demo Role-Switcher**: Tersedia saklar pemilih peran (*Role Switcher*) di bilah navigasi untuk menguji dan mengevaluasi seluruh alur peran secara langsung.
+- Dashboard memilih akses dari role yang tersimpan di database. Pengguna tidak dapat mengganti role dari antarmuka.
 
 ### 2. 5 Cabang Perlombaan
 | No | Cabang Lomba | Kategori | Format Partisipasi | Format Karya | Sistem Penilaian |
@@ -64,7 +64,7 @@ Platform web satu pintu untuk mengelola kompetisi di event **Permifest × Devork
 - **Styling**: Tailwind CSS v4 (Cybersecurity Dark Cyber Theme: Cyan `#06b6d4`, Emerald `#10b981`, Deep Slate `#090d16`)
 - **Icons**: Lucide React
 - **Database & Auth**: PostgreSQL / Supabase ready (`supabase/schema.sql` sudah disiapkan lengkap dengan 22 tabel relasional)
-- **State & Demo Store**: React Context API (`src/lib/store.tsx`) dengan dukungan operasional *instant interactive state*
+- **State**: React Context API (`src/lib/store.tsx`) untuk state UI; autentikasi dan role dibaca dari Supabase.
 
 ---
 
@@ -87,10 +87,20 @@ Platform web satu pintu untuk mengelola kompetisi di event **Permifest × Devork
 
 ---
 
-## 🧪 Akun Demo Siap Pakai
+## Akun demo lokal
 
-Gunakan tombol **Role Switcher** di bilah navigasi kanan atas atau login langsung dengan email berikut:
-- **Peserta**: `peserta@permifest.id`
-- **Juri**: `juri.cyber@permifest.id`
-- **Panitia / Admin**: `panitia@permifest.id`
-- **Super Admin**: `admin@permifest.id`
+Akun demo hanya dibuat pada Supabase lokal. Jalankan Supabase dan migrasinya terlebih dahulu:
+
+```bash
+npx supabase start
+npx supabase db reset
+```
+
+Isi `.env.local` dengan URL dan key Supabase lokal, lalu atur email dan password untuk `DEMO_PANITIA_*`, `DEMO_JURI_*`, dan `DEMO_SUPER_ADMIN_*`. Password demo tidak disimpan di repo. Setelah itu jalankan:
+
+```bash
+npm run db:seed:demo
+```
+
+Script menolak URL Supabase selain `localhost:54321` atau loopback yang setara. Saat pertama kali masuk sebagai Super Admin, siapkan aplikasi autentikator dan selesaikan verifikasi dua langkah sebelum membuka dashboard.
+Seeder memerlukan email berbeda untuk setiap role dan menolak email yang sudah dipakai akun tanpa `app_metadata.permifest_demo=true`. Seeding ulang hanya memperbarui akun yang sebelumnya ditandai sebagai demo.

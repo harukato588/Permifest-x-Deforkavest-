@@ -27,8 +27,10 @@ export interface AuthSessionUser {
   email: string;
   full_name: string;
   role: AppRole;
+  roles: AppRole[];
   institution?: string;
   phone?: string;
   avatar_url?: string;
   is_verified?: boolean;
+  assurance_level?: 'aal1' | 'aal2' | null;
 }
