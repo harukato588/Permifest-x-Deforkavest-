@@ -3,6 +3,7 @@
 import crypto from 'crypto';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient as createServerSupabase } from '@/lib/supabase/server';
+import { requireUser } from '@/lib/auth/session';
 import {
   SignedUploadUrlSchema,
   SignedDownloadUrlSchema,
@@ -47,6 +48,12 @@ export async function getSignedUploadUrlAction(
     }
 
     const { bucket, filename, registrationId, stageId, competitionId } = parsed.data;
+    if (bucket === 'identity-docs') {
+      return {
+        success: false,
+        error: 'Gunakan alur unggah KTM pada halaman Profil Peserta.',
+      };
+    }
 
     // 2. Cek Autentikasi User dari Sesi Cookies
     const supabase = await createServerSupabase();
@@ -70,9 +77,6 @@ export async function getSignedUploadUrlAction(
         break;
       case 'submissions':
         storagePath = `${competitionId || 'general'}/${registrationId}/${stageId || 'main'}/${uniqueFileId}${ext}`;
-        break;
-      case 'identity-docs':
-        storagePath = `${userId}/${uniqueFileId}${ext}`;
         break;
       case 'public-assets':
         storagePath = `assets/${uniqueFileId}${ext}`;
@@ -153,6 +157,12 @@ export async function getSignedDownloadUrlAction(
     }
 
     const { bucket, path, expiresInSeconds, isDownload } = parsed.data;
+    if (bucket === 'identity-docs') {
+      return {
+        success: false,
+        error: 'Akses KTM harus diminta melalui aksi verifikasi identitas.',
+      };
+    }
 
     // Aset publik bisa langsung diunduh tanpa signed URL
     if (bucket === 'public-assets') {
@@ -165,6 +175,34 @@ export async function getSignedDownloadUrlAction(
           bucket,
           path,
         },
+      };
+    }
+
+    await requireUser();
+    const supabase = await createServerSupabase();
+    let authorized = false;
+    if (bucket === 'submissions') {
+      const { data, error } = await supabase
+        .from('submissions')
+        .select('id')
+        .eq('storage_path', path)
+        .maybeSingle();
+      if (error) throw new Error(`Otorisasi unduhan karya gagal: ${error.message}`);
+      authorized = Boolean(data);
+    } else {
+      const { data, error } = await supabase
+        .from('payments')
+        .select('id')
+        .eq('proof_path', path)
+        .maybeSingle();
+      if (error) throw new Error(`Otorisasi unduhan bukti pembayaran gagal: ${error.message}`);
+      authorized = Boolean(data);
+    }
+
+    if (!authorized) {
+      return {
+        success: false,
+        error: 'Berkas tidak ditemukan atau akun kamu tidak memiliki akses.',
       };
     }
 
@@ -238,6 +276,12 @@ export async function verifyAndConfirmUploadAction(
     }
 
     const { bucket, storagePath } = parsed.data;
+    if (bucket === 'identity-docs') {
+      return {
+        success: false,
+        error: 'Konfirmasi KTM harus dilakukan melalui alur verifikasi identitas.',
+      };
+    }
 
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 

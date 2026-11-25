@@ -8,8 +8,8 @@ Temanya Cybersecurity: anggap peserta akan menguji sistem. PRD bagian 3 dan 8 ad
 |---|---|---|
 | Nilai juri | Diubah setelah kunci; dilihat peserta | Trigger `guard_locked_scores`, RLS tanpa akses peserta, `score_changes`, audit |
 | Bukti bayar, identitas | IDOR, bucket publik | Bucket privat, path berisi `user_id`, RLS storage, signed URL singkat |
-| Role | Eskalasi (kirim `role=super_admin`, ubah metadata) | Trigger `handle_new_user`, peran hanya dari `user_roles`, tulis hanya super admin, audit |
-| Karya peserta | Dibaca peserta lain / juri tak ditugaskan | RLS per `assigned`, tanpa listing publik |
+| Role | Eskalasi (kirim `role=super_admin`, ubah metadata/cookie) | Trigger `handle_new_user`, sesi membaca role dari `user_roles`, guard server + RLS, perubahan role hanya super admin |
+| Karya peserta | Dibaca peserta lain / juri tak ditugaskan; identitas terlihat dalam penilaian | RLS per `assigned`, unduhan karya diverifikasi lewat sesi/RLS, tampilan juri memakai ID anonim dan tidak memuat KTM |
 | Upload | Malware, file ganda ekstensi, XSS lewat nama/SVG | Whitelist MIME + ekstensi, cek magic bytes saat konfirmasi, nama uuid, `Content-Disposition: attachment`, tanpa SVG/HTML |
 | Sesi | XSS/CSRF/session fixation | Cookie HttpOnly/Secure/SameSite, CSP, escaping, Server Action dengan origin check |
 | Login/registrasi | Brute force, enumerasi akun, spam | Rate limit (Vercel Firewall/middleware), pesan error seragam, CAPTCHA bila perlu |
@@ -19,15 +19,17 @@ Temanya Cybersecurity: anggap peserta akan menguji sistem. PRD bagian 3 dan 8 ad
 ## 2. Checklist implementasi
 
 **Autentikasi dan sesi**
-- [ ] Password di-hash oleh Supabase Auth; kebijakan panjang minimum; reset via tautan, tidak ada tampilan password.
+- [x] Password di-hash oleh Supabase Auth; password baru minimal 8 karakter dan mengandung angka; reset via tautan, tidak ada tampilan password.
 - [ ] Verifikasi email wajib sebelum mendaftar lomba.
-- [ ] 2FA untuk `super_admin`, dicek `aal2` di server.
-- [ ] Pesan login/reset tidak membocorkan apakah email terdaftar.
+- [x] 2FA untuk `super_admin`, dicek `aal2` di server.
+- [x] Signup publik selalu menetapkan `peserta`; metadata dan cookie klien tidak menentukan role.
+- [x] Pesan login/reset tidak membocorkan apakah email terdaftar.
 
 **Otorisasi**
 - [ ] Semua tabel `enable row level security`; uji penolakan per peran (lihat TESTING).
 - [ ] Setiap Server Action memanggil `requirePermission`. Tidak ada endpoint yang hanya mengandalkan UI.
 - [ ] Parameter id (`registrationId`, `submissionId`) selalu dicek kepemilikan/scope; tidak percaya klien.
+- [ ] Uji bahwa juri hanya membuka penugasan sendiri dan tidak menerima identitas atau KTM pada halaman penilaian.
 - [ ] `SUPABASE_SERVICE_ROLE_KEY` hanya di `lib/supabase/admin.ts` (`server-only`).
 
 **Upload**
@@ -70,6 +72,6 @@ Hanya `super_admin`. Langkah dan jaminan:
 
 - [ ] Uji RLS lolos untuk seluruh matriks `SCHEMA.md` bagian 4.
 - [ ] Uji beban upload dan pendaftaran dilakukan.
-- [ ] Role-switcher demo terbukti tidak ada di build production.
+- [x] Role-switcher demo dihapus; script provisioning akun demo hanya menerima Supabase lokal.
 - [ ] Uji pemulihan backup dilakukan sekali.
 - [ ] Penetration test internal/anggota tim terhadap IDOR, upload, dan eskalasi role.

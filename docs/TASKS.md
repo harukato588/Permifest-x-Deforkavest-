@@ -26,10 +26,13 @@ Status: `[ ]` belum, `[~]` dikerjakan, `[x]` selesai. Satu tugas = satu branch =
 | T1.1 | Proyek Supabase dev/staging/prod + env Vercel | Tiga lingkungan terpisah, tanpa secret di repo | T0.10 | [ ] |
 | T1.2 | Migrasi 22 tabel, enum, RLS, fungsi, trigger, bucket, seed | Semua tabel RLS aktif; seed jalan | T0.4 | [x] |
 | T1.3 | Antarmuka repository + implementasi Supabase untuk `users`, `competitions` | Mock dan Supabase lewat satu antarmuka | T1.2 | [x] |
-| T1.4 | Auth: register, login, verifikasi email, lupa/reset password | Registrasi selalu `peserta`; pesan tidak membocorkan akun | T1.2 | [x] |
-| T1.5 | `requireRole`, `requirePermission`, guard layout per area | Peserta ke URL admin ditolak | T1.4 | [x] |
-| T1.6 | Akun super admin pertama lewat skrip; 2FA wajib | `aal2` dicek di server | T1.5 | [ ] |
+| T1.4 | Auth: register, login, verifikasi email, lupa/reset password | Registrasi selalu `peserta`; password baru tervalidasi; pesan tidak membocorkan akun | T1.2 | [x] |
+| T1.5 | `requireRole`, `requirePermission`, guard layout per area | Role dari database; role yang tidak sesuai ditolak; tanpa role-switcher | T1.4 | [x] |
+| T1.6 | Akun demo panitia, juri, dan super admin lewat skrip lokal; 2FA wajib | Provisioning lokal saja; akun non-demo ditolak; `aal2` dicek di server | T1.5 | [~] |
 | T1.7 | Uji RLS matriks `TESTING.md` bagian 2 | Semua lulus di CI | T1.2 | [ ] |
+| T1.8 | Sinkronkan profil dan password dengan Supabase Auth | Profil tersimpan di database; email dari sesi; password baru tervalidasi | T1.5 | [x] |
+
+Script provisioning T1.6 sudah tersedia, tetapi belum dijalankan karena Supabase lokal dan `.env.local` belum tersedia di workspace ini.
 
 ## Fase 2 - MVP bagian A (akun, konfigurasi, pendaftaran, pembayaran)
 
@@ -52,7 +55,7 @@ Status: `[ ]` belum, `[~]` dikerjakan, `[x]` selesai. Satu tugas = satu branch =
 | T3.1 | Upload karya: signed URL, versi, deadline, validasi Figma | Versi terakhir aktif; tolak setelah deadline | T2.6 | [x] |
 | T3.2 | Editor rubrik (bobot total 100) | Publikasi ditolak bila bobot tak 100 | T2.1 | [x] |
 | T3.3 | Penugasan juri + cek benturan instansi (konfigurasi) | Juri tak ditugaskan tak bisa membaca karya | T3.1 | [x] |
-| T3.4 | Juri: penugasan, viewer, form rubrik, kirim | Skor dalam batas; draf tersimpan | T3.3 | [x] |
+| T3.4 | Juri: penugasan, viewer anonim, form rubrik, kirim | Penugasan dan viewer tersambung ke Supabase; skor dan draf harus tersimpan ke database | T3.3 | [~] |
 | T3.5 | Monitoring penilaian + kunci nilai | Setelah kunci, juri dan panitia tak bisa ubah | T3.4 | [x] |
 | T3.6 | `v_final_scores` dengan agregasi dari konfigurasi | Hasil sama dengan perhitungan manual uji | T3.5 | [x] |
 | T3.7 | Input hasil PES/ML | `unique(placement)` ditegakkan | T2.6 | [x] |

@@ -19,6 +19,10 @@ Tiga bagian: **A** catatan keputusan (ADR), **B** rekonsiliasi PRD vs laporan pr
 | ADR-011 | Nama resmi **Permifest x Deforkafest** (F) | Arahan pemilik; PRD menulis "Devorkafest" | Accepted; PRD perlu dikoreksi |
 | ADR-012 | Leaderboard hanya menampilkan data yang dirilis; mode via konfigurasi | Peserta hanya boleh melihat hasil akhir (PRD 3, 5.5) vs arahan "live" | Proposed, lihat C-09 |
 | ADR-013 | Super admin wajib 2FA, jumlah dibatasi | PRD 3.2 | Accepted |
+| ADR-014 | Role sesi dibaca dari database; tidak ada role-switcher klien | Cookie dan metadata klien bukan sumber otorisasi | Accepted |
+| ADR-015 | Akun demo diprovisikan hanya ke Supabase lokal dari `.env.local` | Mencegah pembuatan akun demo di layanan bersama/production dan menjaga password dari repo | Accepted |
+| ADR-016 | Juri hanya melihat karya yang ditugaskan, tanpa identitas peserta atau KTM | Menjaga penilaian tetap anonim dan membatasi data pribadi | Accepted |
+| ADR-017 | Status pendidikan peserta dikunci setelah pendaftaran pertama; koreksi dilakukan super admin | Mencegah perubahan syarat peserta tanpa pemeriksaan | Accepted |
 
 ## B. Rekonsiliasi dan temuan audit
 
@@ -54,6 +58,8 @@ Tiga bagian: **A** catatan keputusan (ADR), **B** rekonsiliasi PRD vs laporan pr
 | Rendah | Versi dan plugin Tailwind/Next belum diverifikasi (mis. `@tailwindcss/turbopack`) | Build rapuh | T0.9 |
 | Rendah | Perubahan uncommitted di `yuum` | Risiko hilang | T0.1 |
 
+Temuan audit tentang role-switcher, sumber role, guard dashboard, role signup, dan 2FA ditangani pada Tahap 2. Uji matriks RLS dan provisioning akun demo lokal tetap perlu dijalankan.
+
 ## C. Pertanyaan terbuka -> konfigurasi
 
 Setiap item **tidak boleh** dikodekan mati. Kolom "Kunci" adalah tempat nilainya disimpan; "Default" hanya dipakai sampai pemilik memutuskan.
@@ -64,7 +70,7 @@ Setiap item **tidak boleh** dikodekan mati. Kolom "Kunci" adalah tempat nilainya
 | C-02 | Esai dan ITSA: individu/tim, maks anggota | `competitions.participation`, `team_max` | Individu | Terbuka |
 | C-03 | ML: inti dan cadangan; kuota PES/ML | `team_min/team_max/reserve_max`, `quota` | 5/5/1 (placeholder), tanpa kuota | Terbuka |
 | C-04 | Subtema dan jadwal tahap | `themes.subtheme`, `stages.*` | Kosong | Terbuka |
-| C-05 | Juri per karya, blind, rubrik, nilai akhir | `scoring_config`, `rubric_criteria` | 1 juri, tidak blind, `mean` | Terbuka |
+| C-05 | Jumlah juri per karya, rubrik, nilai akhir | `scoring_config`, `rubric_criteria` | 1 juri, `mean` | Terbuka |
 | C-06 | Boleh ikut lebih dari satu lomba | `events.settings.allow_multiple_competitions` | `true` | Asumsi |
 | C-07 | Biaya dan siapa memverifikasi bayar | `competitions.fee_idr`; verifikator = panitia lomba | Placeholder | Terbuka |
 | C-08 | Pengumuman lewat email | `events.settings.email_announcements` | `false` | Terbuka |

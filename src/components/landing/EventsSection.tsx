@@ -82,59 +82,76 @@ export function EventsSection({ id = 'agenda' }: EventsSectionProps) {
     });
   };
 
-  if (publishedEvents.length === 0) return null;
-
   return (
     <section
       id={id}
       aria-labelledby="agenda-heading"
       className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative"
     >
-      {/* ── Section Header: Pop-Art Theme ── */}
       <div className="text-center mb-12">
-        <div className="inline-block px-3.5 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-[#140D33] border border-[#2E2266] text-[#D56BD9] mb-3 select-none">
-          Agenda Unggulan &amp; Seminar
-        </div>
-        <h2
-          id="agenda-heading"
-          className="text-3xl sm:text-4xl lg:text-5xl font-black font-[family-name:var(--font-bricolage)] text-[#F5F2FF] tracking-tight"
-        >
-          Seminar Nasional &amp; <span className="text-[#6CC4FF]">Workshop AI</span>
-        </h2>
-        <p className="mt-3 text-sm sm:text-base text-[#A99FD1] max-w-2xl mx-auto">
-          Perluas wawasan dan jejaring profesionalmu lewat sesi inspiratif bersama praktisi industri, pakar siber, dan arsitek AI terkemuka.
-        </p>
+        {publishedEvents.length === 0 ? (
+          <div
+            role="status"
+            className="mx-auto max-w-3xl rounded-2xl border border-border bg-card px-6 py-10 text-center sm:px-10"
+          >
+            <p className="text-sm font-bold uppercase tracking-wider text-brand-pink">
+              Agenda Seminar
+            </p>
+            <h2
+              id="agenda-heading"
+              className="mt-3 font-[family-name:var(--font-bricolage)] text-2xl font-black tracking-tight text-foreground sm:text-3xl"
+            >
+              Jadwal seminar belum diumumkan
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
+              Informasi agenda akan tampil di sini setelah dipublikasikan oleh panitia.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="inline-block px-3.5 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-[#140D33] border border-[#2E2266] text-[#D56BD9] mb-3 select-none">
+              Agenda Unggulan &amp; Seminar
+            </div>
+            <h2
+              id="agenda-heading"
+              className="text-3xl sm:text-4xl lg:text-5xl font-black font-[family-name:var(--font-bricolage)] text-[#F5F2FF] tracking-tight"
+            >
+              Seminar Nasional &amp; <span className="text-[#6CC4FF]">Workshop AI</span>
+            </h2>
+            <p className="mt-3 text-sm sm:text-base text-[#A99FD1] max-w-2xl mx-auto">
+              Perluas wawasan dan jejaring profesionalmu lewat sesi inspiratif bersama praktisi industri, pakar siber, dan arsitek AI terkemuka.
+            </p>
 
-        {/* Filter Tabs */}
-        <div className="flex items-center justify-center gap-2 mt-6 flex-wrap">
-          {[
-            { id: 'all', label: 'Semua Agenda' },
-            { id: 'seminar', label: 'Seminar Nasional' },
-            { id: 'webinar', label: 'Webinar Online' },
-            { id: 'workshop', label: 'Tech Workshop' },
-          ].map((tab) => {
-            const isActive = activeType === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveType(tab.id as 'all' | EventType)}
-                className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all min-h-[38px] border cursor-pointer ${
-                  isActive
-                    ? 'bg-[#9B6BF2] text-[#0B0720] border-[#9B6BF2] shadow-[3px_3px_0px_#0B0720]'
-                    : 'bg-[#140D33] text-[#A99FD1] border-[#2E2266] hover:text-[#F5F2FF] hover:border-[#9B6BF2]'
-                }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
+            <div className="flex items-center justify-center gap-2 mt-6 flex-wrap">
+              {[
+                { id: 'all', label: 'Semua Agenda' },
+                { id: 'seminar', label: 'Seminar Nasional' },
+                { id: 'webinar', label: 'Webinar Online' },
+                { id: 'workshop', label: 'Tech Workshop' },
+              ].map((tab) => {
+                const isActive = activeType === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveType(tab.id as 'all' | EventType)}
+                    className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all min-h-[38px] border cursor-pointer ${
+                      isActive
+                        ? 'bg-[#9B6BF2] text-[#0B0720] border-[#9B6BF2] shadow-[3px_3px_0px_#0B0720]'
+                        : 'bg-[#140D33] text-[#A99FD1] border-[#2E2266] hover:text-[#F5F2FF] hover:border-[#9B6BF2]'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
 
-      {/* ── Grid Kartu Agenda ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredEvents.map((item) => {
+        {publishedEvents.length > 0 && filteredEvents.map((item) => {
           const typeMeta = EVENT_TYPE_MAP[item.type] || EVENT_TYPE_MAP.seminar;
           const formatInfo = FORMAT_MAP[item.format] || FORMAT_MAP.offline;
           const FormatIcon = formatInfo.icon;

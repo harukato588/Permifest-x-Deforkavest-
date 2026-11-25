@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useAppStore } from '@/lib/store';
 import { ROLE_LABELS } from '@/lib/constants';
+import { updateProfileAction } from '@/features/users/actions';
 import { 
   Scales, 
   ShieldCheck, 
@@ -23,9 +24,11 @@ export default function JuriProfilPage() {
   const { currentUser, setCurrentUser, judgeAssignments, competitions } = useAppStore();
 
   const [fullName, setFullName] = useState(currentUser.full_name);
-  const [institution, setInstitution] = useState(currentUser.institution || 'Universitas Sarjanawiyata Tamansiswa (UST)');
-  const [phone, setPhone] = useState(currentUser.phone || '0813-9876-5432');
+  const [institution, setInstitution] = useState(currentUser.institution || '');
+  const [phone, setPhone] = useState(currentUser.phone || '');
   const [savedBanner, setSavedBanner] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Penugasan juri ini
   const myAssignments = judgeAssignments.filter((a) => a.judge_id === currentUser.id);
@@ -35,15 +38,24 @@ export default function JuriProfilPage() {
   // Cabang lomba akademik yang relevan
   const academicComps = competitions.filter((c) => c.type === 'academic');
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setCurrentUser({
-      ...currentUser,
-      full_name: fullName,
-      institution: institution,
-      phone: phone,
-    });
-    setSavedBanner('Profil dan data dewan juri berhasil disimpan.');
+    setSavedBanner(null);
+    setErrorMessage(null);
+    setIsSaving(true);
+    try {
+      const result = await updateProfileAction({ fullName, institution, phone });
+      if (!result.success || !result.data) {
+        setErrorMessage(result.message || 'Profil gagal disimpan. Coba lagi.');
+        return;
+      }
+      setCurrentUser({ ...currentUser, ...result.data });
+      setSavedBanner(result.message || 'Perubahan profil berhasil disimpan.');
+    } catch {
+      setErrorMessage('Profil gagal disimpan. Periksa koneksi lalu coba lagi.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -57,6 +69,12 @@ export default function JuriProfilPage() {
           <Alert variant="success" onClose={() => setSavedBanner(null)}>
             <AlertTitle>Perubahan Berhasil Disimpan</AlertTitle>
             <AlertDescription>{savedBanner}</AlertDescription>
+          </Alert>
+        )}
+        {errorMessage && (
+          <Alert variant="destructive" onClose={() => setErrorMessage(null)}>
+            <AlertTitle>Gagal menyimpan profil</AlertTitle>
+            <AlertDescription>{errorMessage}</AlertDescription>
           </Alert>
         )}
 
@@ -150,7 +168,7 @@ export default function JuriProfilPage() {
                 />
 
                 <div className="pt-2 flex justify-end">
-                  <Button type="submit" variant="primary">
+                  <Button type="submit" variant="primary" isLoading={isSaving}>
                     Simpan Perubahan
                   </Button>
                 </div>

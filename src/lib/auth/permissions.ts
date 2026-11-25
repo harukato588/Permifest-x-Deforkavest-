@@ -61,10 +61,17 @@ export function hasPermission(role: AppRole, permission: AppPermission): boolean
   return (allowed as readonly string[]).includes(permission);
 }
 
+export function hasUserPermission(
+  user: AuthSessionUser,
+  permission: AppPermission
+): boolean {
+  return user.roles.some((role) => hasPermission(role, permission));
+}
+
 /**
  * Helper otorisasi level pengguna
  */
 export function can(user: AuthSessionUser | null | undefined, permission: AppPermission): boolean {
   if (!user) return false;
-  return hasPermission(user.role, permission);
+  return hasUserPermission(user, permission);
 }

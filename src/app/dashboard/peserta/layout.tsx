@@ -1,8 +1,6 @@
 import React from 'react';
-import { redirect } from 'next/navigation';
-import { connection } from 'next/server';
-import { getCurrentUser } from '@/lib/auth/session';
-import { isSupabaseLive } from '@/lib/supabase/status';
+import { AppProvider } from '@/lib/store';
+import { requireDashboardUser, toAppUser } from '@/lib/auth/session';
 
 export const instant = false;
 
@@ -11,13 +9,6 @@ export default async function PesertaAreaLayout({
 }: {
   children: React.ReactNode;
 }) {
-  if (isSupabaseLive()) {
-    await connection();
-    const user = await getCurrentUser();
-    if (!user) {
-      redirect('/login?redirect=/dashboard/peserta');
-    }
-  }
-
-  return <>{children}</>;
+  const user = await requireDashboardUser(['peserta'], '/dashboard/peserta');
+  return <AppProvider initialUser={toAppUser(user)}>{children}</AppProvider>;
 }

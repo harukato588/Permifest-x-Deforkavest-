@@ -5,6 +5,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/). Versi: SemV
 ## [Unreleased]
 
 ### Added
+- Profil peserta memuat status pendidikan dan alur unggah KTM privat. Mahasiswa perlu mengunggah KTM sebelum mendaftar, sementara koreksi status setelah pendaftaran pertama hanya dapat dilakukan super admin.
+- Dashboard juri membaca penugasan dari Supabase, menyamarkan identitas peserta, serta membatasi unduhan karya ke penugasan milik juri. Form penyimpanan skor belum tersambung ke Supabase.
+- Penguatan autentikasi dan role: menghapus role-switcher, mengambil profil dan role dari Supabase, menolak akses dashboard lintas role, menambahkan MFA wajib untuk Super Admin, serta menyediakan script provisioning akun demo yang hanya menerima Supabase lokal.
+- Seeder demo menolak email Auth yang dipakai akun tanpa `app_metadata.permifest_demo=true`; seeding ulang hanya memperbarui akun demo yang ditandai.
+- Profil kini disimpan melalui sesi pengguna; validasi password baru dipakai pada registrasi, reset, dan perubahan password. Password lama tetap dapat dipakai untuk login.
 - Modul Pengumpulan Karya Peserta (Submission - T3.1):
   - Modul domain `src/features/submissions/` dengan validasi Zod (`schema.ts`), queries database server-side (`queries.ts`), dan Server Action `submitWorkAction` (`actions.ts`).
   - Penegakan integritas server-side: verifikasi kepemilikan registrasi, pengecekan status pendaftaran terverifikasi, validasi deadline tahapan lomba, penomoran versi otomatis (`version = 1, 2, ...` & `is_latest`), serta pencatatan ke `audit_logs`.
@@ -39,6 +44,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/). Versi: SemV
   - Tanya Jawab (`FaqSection.tsx` & `src/app/informasi/page.tsx`): Pertanyaan dan jawaban FAQ serta kontak sekretariat membaca langsung dari state `faqs` dan `systemSettings` terpusat.
 
 ### Fixed
+<<<<<<< HEAD
+- Penghapusan Role Switcher Demo & Pengetatan Akses Hak Peran:
+  - Menghapus komponen demo role-switcher ("Ganti Role Demo: DEV ONLY") pada Sidebar dashboard (`src/components/layout/sidebar.tsx`) sehingga pengguna/peserta tidak dapat lagi mengganti peran secara bebas ke panitia, juri, atau super admin.
+  - Memperketat `AdminAreaLayout` (`/dashboard/admin`), `JuriAreaLayout` (`/dashboard/juri`), dan `PesertaAreaLayout` (`/dashboard/peserta`) untuk selalu memvalidasi peran pengguna dari sesi server sebelum merender konten, dan mengarahkan otomatis (*redirect*) pengguna yang tidak berwenang kembali ke dashboard peserta.
+  - Memperbaiki rekursi RLS pada relasi `team_members` di database Supabase dengan fungsi `is_team_member` bertipe `SECURITY DEFINER` (`20261124000001_fix_team_members_rls_recursion.sql`).
+  - Mengamankan query admin `getAllSubmissionsForAdminQuery` agar menggunakan `createAdminClient()` di sisi server setelah verifikasi izin `submissions.read`.
+=======
+- Navbar: Agenda Seminar tetap tampil di desktop, agenda kosong mempertahankan target `#agenda`, dan penanda Guidebook mengikuti halaman aktif di navbar mobile.
+>>>>>>> d43eafe (fix: restore public navbar navigation)
 - Audit pra-deployment:
   - Perbaikan 2 error ESLint dan 4 warning: penggantian `any` type pada `src/app/informasi/page.tsx`, perbaikan cascading `setState` dalam effect `src/components/guidebook/PdfViewerModal.tsx` dengan pembungkusan `useCallback`, pembersihan dependensi dan variabel tidak terpakai di `src/components/landing/CompetitionsSection.tsx`, dan penambahan metadata berkas di `src/app/guidebook/page.tsx`.
   - Pengamanan mutlak akun demo dan injeksi cookie demo (`src/features/auth/actions.ts`, `src/proxy.ts`, `src/lib/auth/session.ts`) agar tidak dapat disalahgunakan di lingkungan produksi (hanya aktif di development atau saat flag `NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS=true` sengaja disetel).

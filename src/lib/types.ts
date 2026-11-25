@@ -10,6 +10,7 @@ export interface User {
   full_name: string;
   institution?: string;
   phone?: string;
+  education_level?: 'mahasiswa' | 'sma_smk' | 'umum' | null;
   avatar_url?: string | null;
   role: UserRole;
   email_verified: boolean;

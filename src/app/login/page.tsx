@@ -8,27 +8,15 @@ import { Footer } from '@/components/layout/footer';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { SakugaButton } from '@/components/ui/sakuga-button';
-import { useAppStore } from '@/lib/store';
 import { loginAction } from '@/features/auth/actions';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { switchRole } = useAppStore();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const isDemoAllowed =
-    process.env.NODE_ENV !== 'production' ||
-    process.env.NEXT_PUBLIC_ENABLE_DEMO_ACCOUNTS === 'true';
-
-  const fillQuickAccount = (demoEmail: string, role: 'peserta' | 'juri' | 'panitia' | 'super_admin') => {
-    setEmail(demoEmail);
-    setPassword('password123');
-    switchRole(role);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,23 +28,6 @@ export default function LoginPage() {
       if (!result.success || !result.data) {
         setErrorMessage(result.message || 'Gagal masuk akun. Periksa email dan password.');
         return;
-      }
-
-      // Sinkronkan role store demo agar konsisten
-      const detectedRole = result.data.role;
-      if (
-        detectedRole === 'peserta' ||
-        detectedRole === 'juri' ||
-        detectedRole === 'panitia' ||
-        detectedRole === 'super_admin'
-      ) {
-        switchRole(detectedRole);
-      } else if (email.includes('juri')) {
-        switchRole('juri');
-      } else if (email.includes('panitia') || email.includes('admin')) {
-        switchRole('panitia');
-      } else {
-        switchRole('peserta');
       }
 
       router.push(result.data.redirectUrl);
@@ -192,46 +163,6 @@ export default function LoginPage() {
                   Masuk Sekarang
                 </SakugaButton>
               </div>
-
-              {/* Quick One-Click Demo Accounts Selector (Hanya Tampil di Non-Production / Dev Mode) */}
-              {isDemoAllowed && (
-                <div className="mt-6 p-3.5 rounded-2xl bg-[#0B0720] border border-[#2E2266] space-y-2">
-                  <div className="flex items-center justify-between text-[11px] font-bold text-[#A99FD1] uppercase tracking-wider">
-                    <span>Pilih Akun Demo Cepat</span>
-                    <span className="text-[#FFE359]">Mode Dev / Demo</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => fillQuickAccount('peserta@permifest.id', 'peserta')}
-                      className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#140D33] border border-[#2E2266] hover:border-[#9B6BF2] text-[#F5F2FF] hover:text-[#6CC4FF] transition-all text-left cursor-pointer"
-                    >
-                      Peserta Demo
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => fillQuickAccount('juri@permifest.id', 'juri')}
-                      className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#140D33] border border-[#2E2266] hover:border-[#9B6BF2] text-[#F5F2FF] hover:text-[#FFE359] transition-all text-left cursor-pointer"
-                    >
-                      Dewan Juri
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => fillQuickAccount('panitia@permifest.id', 'panitia')}
-                      className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#140D33] border border-[#2E2266] hover:border-[#9B6BF2] text-[#F5F2FF] hover:text-[#C4F15A] transition-all text-left cursor-pointer"
-                    >
-                      Panitia Lomba
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => fillQuickAccount('admin@permifest.id', 'super_admin')}
-                      className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-[#140D33] border border-[#2E2266] hover:border-[#9B6BF2] text-[#F5F2FF] hover:text-[#D56BD9] transition-all text-left cursor-pointer"
-                    >
-                      Super Admin
-                    </button>
-                  </div>
-                </div>
-              )}
 
               <div className="text-center text-xs text-[#A99FD1] pt-3 border-t border-[#2E2266]/80">
                 Belum punya akun?{' '}

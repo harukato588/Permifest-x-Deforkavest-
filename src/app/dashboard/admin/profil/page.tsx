@@ -10,6 +10,8 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useAppStore } from '@/lib/store';
 import { ROLE_LABELS } from '@/lib/constants';
 import { formatDateShort } from '@/lib/utils';
+import { changePasswordAction } from '@/features/auth/actions';
+import { updateProfileAction } from '@/features/users/actions';
 import { 
   ShieldCheck, 
   Key, 
@@ -23,8 +25,8 @@ export default function AdminProfilPage() {
   const { currentUser, setCurrentUser, auditLogs } = useAppStore();
 
   const [fullName, setFullName] = useState(currentUser.full_name);
-  const [institution, setInstitution] = useState(currentUser.institution || 'Panitia Pelaksana Permifest x Deforkafest 2026');
-  const [phone, setPhone] = useState(currentUser.phone || '0812-3456-7890');
+  const [institution, setInstitution] = useState(currentUser.institution || '');
+  const [phone, setPhone] = useState(currentUser.phone || '');
 
   // State Ubah Password
   const [currentPassword, setCurrentPassword] = useState('');
@@ -32,49 +34,62 @@ export default function AdminProfilPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   // State Banner Profil
   const [profileSuccess, setProfileSuccess] = useState<string | null>(null);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   // Filter aktivitas audit log milik admin ini
   const myAuditLogs = auditLogs
     .filter((log) => log.user_id === currentUser.id || log.user_email === currentUser.email)
     .slice(0, 5);
 
-  const handleProfileSave = (e: React.FormEvent) => {
+  const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setCurrentUser({
-      ...currentUser,
-      full_name: fullName,
-      institution: institution,
-      phone: phone,
-    });
-    setProfileSuccess('Data profil operasional panitia berhasil diperbarui!');
+    setProfileError(null);
+    setProfileSuccess(null);
+    setIsSavingProfile(true);
+    try {
+      const result = await updateProfileAction({ fullName, institution, phone });
+      if (!result.success || !result.data) {
+        setProfileError(result.message || 'Profil gagal disimpan. Coba lagi.');
+        return;
+      }
+      setCurrentUser({ ...currentUser, ...result.data });
+      setProfileSuccess(result.message || 'Perubahan profil berhasil disimpan.');
+    } catch {
+      setProfileError('Profil gagal disimpan. Periksa koneksi lalu coba lagi.');
+    } finally {
+      setIsSavingProfile(false);
+    }
   };
 
-  const handlePasswordChange = (e: React.FormEvent) => {
+  const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordError(null);
     setPasswordSuccess(null);
-
-    if (!currentPassword) {
-      setPasswordError('Silakan masukkan kata sandi Anda saat ini.');
-      return;
+    setIsChangingPassword(true);
+    try {
+      const result = await changePasswordAction({
+        currentPassword,
+        newPassword,
+        confirmPassword,
+      });
+      if (!result.success) {
+        setPasswordError(result.message || 'Kata sandi gagal diperbarui. Coba lagi.');
+        return;
+      }
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setPasswordSuccess(result.message || 'Kata sandi berhasil diperbarui.');
+    } catch {
+      setPasswordError('Kata sandi gagal diperbarui. Periksa koneksi lalu coba lagi.');
+    } finally {
+      setIsChangingPassword(false);
     }
-    if (newPassword.length < 8) {
-      setPasswordError('Kata sandi baru minimal harus terdiri dari 8 karakter.');
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setPasswordError('Konfirmasi kata sandi baru tidak cocok.');
-      return;
-    }
-
-    // Simulasi sukses
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
-    setPasswordSuccess('Kata sandi keamanan akun berhasil diperbarui secara aman.');
   };
 
   return (
@@ -89,6 +104,12 @@ export default function AdminProfilPage() {
           <Alert variant="success" onClose={() => setProfileSuccess(null)}>
             <AlertTitle>Pembaruan Tersimpan</AlertTitle>
             <AlertDescription>{profileSuccess}</AlertDescription>
+          </Alert>
+        )}
+        {profileError && (
+          <Alert variant="destructive" onClose={() => setProfileError(null)}>
+            <AlertTitle>Gagal menyimpan profil</AlertTitle>
+            <AlertDescription>{profileError}</AlertDescription>
           </Alert>
         )}
 
@@ -179,7 +200,7 @@ export default function AdminProfilPage() {
                 />
 
                 <div className="pt-2 flex justify-end">
-                  <Button type="submit" variant="primary">
+                  <Button type="submit" variant="primary" isLoading={isSavingProfile}>
                     Simpan Perubahan Profil
                   </Button>
                 </div>
@@ -240,7 +261,7 @@ export default function AdminProfilPage() {
                   />
 
                   <div className="pt-2 flex justify-end">
-                    <Button type="submit" variant="outline">
+                    <Button type="submit" variant="outline" isLoading={isChangingPassword}>
                       Perbarui Kata Sandi
                     </Button>
                   </div>

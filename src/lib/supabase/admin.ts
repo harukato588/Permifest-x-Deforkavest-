@@ -18,19 +18,19 @@ export function createAdminClient(): SupabaseClient {
     return adminClientInstance;
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+  if (!supabaseUrl || supabaseUrl.includes('placeholder.supabase.co')) {
+    throw new Error('NEXT_PUBLIC_SUPABASE_URL must be configured before using the admin client.');
+  }
   if (!serviceRoleKey) {
-    // Mode demo / fallback jika service role belum diisi di .env.local
-    console.warn(
-      ''
-    );
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY must be configured before using the admin client.');
   }
 
   adminClientInstance = createClient(
     supabaseUrl,
-    serviceRoleKey || 'placeholder-service-role-key',
+    serviceRoleKey,
     {
       auth: {
         autoRefreshToken: false,

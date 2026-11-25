@@ -8,12 +8,10 @@ import { Footer } from '@/components/layout/footer';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { SakugaButton } from '@/components/ui/sakuga-button';
-import { useAppStore } from '@/lib/store';
 import { registerAction } from '@/features/auth/actions';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { setCurrentUser } = useAppStore();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -45,21 +43,10 @@ export default function RegisterPage() {
         return;
       }
 
-      // Sinkronkan ke store demo
-      setCurrentUser({
-        id: `user-${Date.now()}`,
-        email,
-        full_name: fullName,
-        institution,
-        phone,
-        role: 'peserta',
-        email_verified: !res.data?.requiresVerification,
-      });
-
       setSuccessInfo(res.message || 'Pendaftaran akun berhasil!');
 
       setTimeout(() => {
-        router.push('/dashboard/peserta');
+        router.push(res.data?.requiresVerification ? '/verifikasi-email' : '/dashboard/peserta');
       }, 1000);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Terjadi kegagalan koneksi.';
@@ -215,9 +202,13 @@ export default function RegisterPage() {
                     label="Kata Sandi (Password)"
                     type="password"
                     required
+                    minLength={8}
+                    pattern="(?=.*[0-9]).*"
+                    title="Password minimal 8 karakter dan harus mengandung angka."
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Min. 8 karakter"
+                    helperText="Password minimal 8 karakter dan harus mengandung angka."
                     className="bg-[#0B0720] border-[#2E2266] focus:border-[#9B6BF2]"
                   />
                   <Input

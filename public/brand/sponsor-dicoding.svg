@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 48" fill="none" role="img" aria-label="Dicoding Indonesia Logo">
-  <rect width="160" height="48" rx="8" fill="#140D33"/>
-  <circle cx="24" cy="24" r="14" fill="#2E2266"/>
-  <text x="20" y="29" fill="#2D9CDB" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="900">{d}</text>
-  <text x="46" y="24" fill="#F5F2FF" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700">Dicoding</text>
-  <text x="46" y="35" fill="#A99FD1" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="500">INDONESIA</text>
-</svg>

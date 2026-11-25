@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { createClient as createServerSupabase } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { requireUser, requirePermission } from '@/lib/auth/session';
 
 export interface SubmissionRow extends Record<string, unknown> {
@@ -105,7 +106,7 @@ export async function getAllSubmissionsForAdminQuery(filters?: {
   onlyLatest?: boolean;
 }): Promise<SubmissionRow[]> {
   await requirePermission('submissions.read');
-  const supabase = await createServerSupabase();
+  const supabase = createAdminClient();
 
   let query = supabase
     .from('submissions')
