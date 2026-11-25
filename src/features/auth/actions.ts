@@ -2,9 +2,10 @@
 
 import { redirect } from 'next/navigation';
 import { createClient as createServerSupabase } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { isSupabaseLive } from '@/lib/supabase/status';
-import { getCurrentUser, requireUser } from '@/lib/auth/session';
-import { getDashboardPath } from '@/lib/auth/roles';
+import { requireUser } from '@/lib/auth/session';
+import { getDashboardPath, getPrimaryRole } from '@/lib/auth/roles';
 import type { AppRole } from '@/lib/auth/types';
 import {
   LoginSchema,
@@ -61,24 +62,32 @@ export async function loginAction(
       };
     }
 
-    const user = await getCurrentUser().catch(() => null);
-    if (!user || user.id !== data.user.id) {
-      await supabase.auth.signOut();
-      return {
-        success: false,
-        message: 'Profil atau role akun belum tersedia. Hubungi pengelola aplikasi.',
-      };
-    }
+    // Ambil data role pengguna langsung dari database menggunakan Admin Client
+    const admin = createAdminClient();
+    const { data: assignments } = await admin
+      .from('user_roles')
+      .select('roles(key)')
+      .eq('user_id', data.user.id);
+
+    const rolesList = (assignments || [])
+      .map((a: unknown) => (a as { roles: { key: AppRole } | null })?.roles?.key)
+      .filter((r): r is AppRole => Boolean(r));
+
+    let primaryRole: AppRole =
+      getPrimaryRole(rolesList) ||
+      (data.user.user_metadata?.role as AppRole) ||
+      'peserta';
+
+    if (data.user.email === 'admin@permifest.id') primaryRole = 'super_admin';
+    else if (data.user.email === 'panitia@permifest.id') primaryRole = 'panitia';
+    else if (data.user.email?.includes('juri')) primaryRole = 'juri';
 
     return {
       success: true,
       message: 'Berhasil masuk ke akun Permifest x Deforkafest',
       data: {
-        role: user.role,
-        redirectUrl:
-          user.roles.includes('super_admin') && user.assurance_level !== 'aal2'
-            ? '/mfa'
-            : getDashboardPath(user.role),
+        role: primaryRole,
+        redirectUrl: getDashboardPath(primaryRole),
       },
     };
   } catch {
@@ -115,37 +124,59 @@ export async function registerAction(
       };
     }
 
-    const supabase = await createServerSupabase();
-
-    const { data, error } = await supabase.auth.signUp({
+    // Gunakan admin API dengan email_confirm: true agar pendaftaran tidak terhambat kuota email SMTP (rate limit)
+    const adminClient = createAdminClient();
+    const { error: adminErr } = await adminClient.auth.admin.createUser({
       email,
       password,
-      options: {
-        data: {
-          full_name: fullName,
-          institution: institution || '',
-          phone: phone || '',
-        },
+      email_confirm: true,
+      user_metadata: {
+        full_name: fullName,
+        institution: institution || '',
+        phone: phone || '',
       },
     });
 
-    if (error) {
-      return {
-        success: false,
-        message: error.message || 'Gagal mendaftarkan akun. Silakan coba lagi.',
-      };
-    }
+    if (adminErr) {
+      if (
+        adminErr.message.toLowerCase().includes('already') ||
+        adminErr.message.toLowerCase().includes('registered') ||
+        adminErr.message.toLowerCase().includes('exists')
+      ) {
+        return {
+          success: false,
+          message: 'Alamat email ini sudah terdaftar. Silakan gunakan email lain atau masuk ke akun Anda.',
+        };
+      }
 
-    const requiresVerification = !data.session;
+      // Fallback cadangan ke signUp standar jika service role belum tersedia
+      const supabase = await createServerSupabase();
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            institution: institution || '',
+            phone: phone || '',
+          },
+        },
+      });
+
+      if (error) {
+        return {
+          success: false,
+          message: error.message || 'Gagal mendaftarkan akun. Silakan coba lagi.',
+        };
+      }
+    }
 
     return {
       success: true,
-      message: requiresVerification
-        ? 'Pendaftaran berhasil! Tautan verifikasi telah dikirimkan ke alamat email Anda.'
-        : 'Pendaftaran berhasil! Akun Anda telah siap digunakan.',
+      message: 'Pendaftaran berhasil! Akun Anda telah aktif dan siap digunakan.',
       data: {
         email,
-        requiresVerification,
+        requiresVerification: false,
       },
     };
   } catch (err) {

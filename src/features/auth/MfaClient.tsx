@@ -97,7 +97,7 @@ export function MfaClient() {
                   berikut secara manual.
                 </p>
                 <Image
-                  src={setup.qrCode}
+                  src={setup.qrCode.trim()}
                   alt="Kode QR untuk menautkan akun Super Admin ke aplikasi autentikator"
                   width={220}
                   height={220}

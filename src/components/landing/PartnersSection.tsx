@@ -22,10 +22,6 @@ export function PartnersSection() {
     );
   }, [activePartners]);
 
-  const sponsors = useMemo(() => {
-    return activePartners.filter((p) => p.category === 'sponsor' || p.category === 'media_partner');
-  }, [activePartners]);
-
   return (
     <section
       id="mitra"

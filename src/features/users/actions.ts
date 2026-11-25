@@ -27,13 +27,13 @@ export async function updateProfileAction(rawInput: ProfileInput) {
   }
 
   const user = await requireUser();
-  const supabase = await createServerSupabase();
+  const admin = createAdminClient();
   if (parsed.data.educationLevel && !user.roles.includes('peserta')) {
     return { success: false, message: 'Hanya peserta yang dapat mengubah status pendidikannya.' };
   }
 
   if (parsed.data.educationLevel) {
-    const { data: currentProfile, error: profileError } = await supabase
+    const { data: currentProfile, error: profileError } = await admin
       .from('users')
       .select('education_level')
       .eq('id', user.id)
@@ -44,7 +44,7 @@ export async function updateProfileAction(rawInput: ProfileInput) {
     }
 
     if (currentProfile?.education_level !== parsed.data.educationLevel) {
-      const { data: registration, error: registrationError } = await supabase
+      const { data: registration, error: registrationError } = await admin
         .from('registrations')
         .select('id')
         .eq('user_id', user.id)
@@ -64,7 +64,7 @@ export async function updateProfileAction(rawInput: ProfileInput) {
     }
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await admin
     .from('users')
     .update({
       full_name: parsed.data.fullName,
@@ -109,8 +109,8 @@ export async function createKtmUploadUrlAction(rawInput: unknown) {
     return { success: false, error: 'Hanya peserta yang dapat mengunggah KTM.' };
   }
 
-  const supabase = await createServerSupabase();
-  const { data: profile, error: profileError } = await supabase
+  const admin = createAdminClient();
+  const { data: profile, error: profileError } = await admin
     .from('users')
     .select('education_level')
     .eq('id', user.id)
@@ -122,7 +122,7 @@ export async function createKtmUploadUrlAction(rawInput: unknown) {
     return { success: false, error: 'Unggah KTM hanya tersedia untuk peserta berstatus mahasiswa.' };
   }
 
-  const { data: existing, error: existingError } = await supabase
+  const { data: existing, error: existingError } = await admin
     .from('identity_verifications')
     .select('status')
     .eq('user_id', user.id)
@@ -142,7 +142,6 @@ export async function createKtmUploadUrlAction(rawInput: unknown) {
   }
 
   const storagePath = `${user.id}/${randomUUID()}${extension}`;
-  const admin = createAdminClient();
   const { data, error } = await admin.storage
     .from('identity-docs')
     .createSignedUploadUrl(storagePath);

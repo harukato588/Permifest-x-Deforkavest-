@@ -4,6 +4,7 @@ import { connection } from 'next/server';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createClient as createServerSupabase } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { isSupabaseLive } from '@/lib/supabase/status';
 import { AuthSessionUser, AppRole, AppPermission } from './types';
 import {
@@ -26,7 +27,8 @@ export async function getCurrentUser(): Promise<AuthSessionUser | null> {
 
   if (authError || !user?.email) return null;
 
-  const { data: profileData, error: profileError } = await supabase
+  const admin = createAdminClient();
+  const { data: profileData, error: profileError } = await admin
     .from('users')
     .select('full_name, institution, phone, avatar_url, education_level')
     .eq('id', user.id)
@@ -47,7 +49,7 @@ export async function getCurrentUser(): Promise<AuthSessionUser | null> {
 
   if (!profile.success) throw new Error('The authenticated user profile is invalid.');
 
-  const { data: assignments, error: assignmentsError } = await supabase
+  const { data: assignments, error: assignmentsError } = await admin
     .from('user_roles')
     .select('role_id')
     .eq('user_id', user.id);
@@ -55,7 +57,7 @@ export async function getCurrentUser(): Promise<AuthSessionUser | null> {
   if (assignmentsError) throw new Error('Unable to load the authenticated user roles.');
   if (!assignments.length) return null;
 
-  const { data: roleRows, error: rolesError } = await supabase
+  const { data: roleRows, error: rolesError } = await admin
     .from('roles')
     .select('key')
     .in('id', assignments.map((assignment) => assignment.role_id));

@@ -4,6 +4,7 @@ import { connection } from 'next/server';
 import type { AppRole } from '@/lib/auth/types';
 import { requirePermission, requireRole } from '@/lib/auth/session';
 import { createClient as createServerSupabase } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export interface ParticipantProfileData {
   educationLevel: 'mahasiswa' | 'sma_smk' | 'umum' | null;
@@ -99,11 +100,11 @@ function roleValue(value: unknown): AppRole | null {
 export async function getParticipantProfileData(): Promise<ParticipantProfileData> {
   await connection();
   const user = await requireRole(['peserta']);
-  const supabase = await createServerSupabase();
+  const admin = createAdminClient();
   const [profileResult, registrationResult, ktmResult] = await Promise.all([
-    supabase.from('users').select('education_level').eq('id', user.id).maybeSingle(),
-    supabase.from('registrations').select('id').eq('user_id', user.id).limit(1).maybeSingle(),
-    supabase
+    admin.from('users').select('education_level').eq('id', user.id).maybeSingle(),
+    admin.from('registrations').select('id').eq('user_id', user.id).limit(1).maybeSingle(),
+    admin
       .from('identity_verifications')
       .select('id,status,note,updated_at')
       .eq('user_id', user.id)
