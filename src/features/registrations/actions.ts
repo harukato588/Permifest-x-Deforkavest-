@@ -122,11 +122,12 @@ export async function registerCompetitionAction(
 
     // 4. Validasi form_fields dinamis
     const requiredFields = Array.isArray(comp.form_fields)
-      ? (comp.form_fields as Array<{ id: string; required?: boolean }>).filter((f) => f.required)
+      ? (comp.form_fields as Array<{ id?: string; key?: string; label?: string; required?: boolean }>).filter((f) => f.required)
       : [];
     for (const field of requiredFields) {
-      if (!form_data[field.id]) {
-        return { success: false, error: `Kolom "${field.id}" wajib diisi.` };
+      const fieldKey = field.id || field.key;
+      if (fieldKey && !form_data[fieldKey]) {
+        return { success: false, error: `Kolom "${field.label || fieldKey}" wajib diisi.` };
       }
     }
 
@@ -195,7 +196,7 @@ export async function registerCompetitionAction(
     if (Number(comp.fee_idr) > 0) {
       const { error: payErr } = await admin.from('payments').insert({
         registration_id: reg.id,
-        amount: Number(comp.fee_idr),
+        amount_idr: Number(comp.fee_idr),
         status: 'awaiting_proof',
         attempt: 1,
       });

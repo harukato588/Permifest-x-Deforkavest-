@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     template: '%s | Permifest x Deforkafest 2026',
   },
   description:
-    'Platform perlombaan satu pintu Permifest x Deforkafest (Permikomnas Yogyakarta x IMPSI UST Yogyakarta). 5 Cabang Lomba: Esai Ilmiah, UI/UX Design, IT System Architecture, PES e-Football, dan Mobile Legends, serta Seminar Nasional & Tech Workshop.',
+    'Platform perlombaan satu pintu Permifest x Deforkafest (Permikomnas Yogyakarta x IMPSI UST Yogyakarta). 3 Cabang Lomba Akademik: Esai Ilmiah, UI/UX Design, dan IT System Architecture, serta Seminar Nasional & Tech Workshop.',
   keywords: [
     'Permifest',
     'Deforkafest',

@@ -42,15 +42,13 @@ export const MOCK_ANNOUNCEMENTS: Announcement[] = [
     id: 'ann-1',
     competition_id: null,
     title: 'Pendaftaran Permifest x Deforkafest 2026 Resmi Dibuka!',
-    excerpt: 'Pendaftaran untuk seluruh 5 cabang perlombaan telah resmi dibuka hingga 10 Desember 2026.',
+    excerpt: 'Pendaftaran untuk 3 cabang perlombaan akademik telah resmi dibuka mulai 24 November 2026.',
     content: `Selamat datang para talenta masa depan!
 
-Panitia Permifest x Deforkafest 2026 mengumumkan bahwa pendaftaran seluruh cabang kompetisi telah dibuka:
+Panitia Permifest x Deforkafest 2026 mengumumkan bahwa pendaftaran cabang kompetisi akademik telah dibuka:
 1. Esai Ilmiah Cybersecurity
 2. UI/UX Design Challenge
 3. IT System Architecture
-4. eFootball / PES Championship
-5. Mobile Legends: Bang Bang
 
 Silakan pilih lomba yang sesuai dengan minat dan kemampuan Anda, selesaikan pembayaran dan verifikasi, serta persiapkan karya terbaik Anda.
 
@@ -202,36 +200,6 @@ export const MOCK_GUIDEBOOKS: Guidebook[] = [
     is_published: true,
     created_at: '2026-11-08T08:00:00Z',
     updated_at: '2026-11-23T10:00:00Z',
-  },
-  {
-    id: 'guidebook-pes',
-    title: 'Regulasi Pertandingan PES 2026 e-Football',
-    category: 'pes',
-    competition_id: 'c4444444-4444-4444-4444-444444444444',
-    file_url: '/docs/guidebook-permifest-2026.pdf',
-    file_name: 'Regulasi_PES_eFootball_2026.pdf',
-    file_size_bytes: 1850000,
-    version: 'v1.1',
-    description: 'Pengaturan controller, durasi match 10 menit, sistem bracket knockout, ketentuan pemilihan tim, dan tata tertib venue offline UST.',
-    release_notes: 'Penetapan versi game update resmi dan aturan controller pribadi.',
-    is_published: true,
-    created_at: '2026-11-10T08:00:00Z',
-    updated_at: '2026-11-20T16:00:00Z',
-  },
-  {
-    id: 'guidebook-ml',
-    title: 'Regulasi Turnamen Mobile Legends: Bang Bang',
-    category: 'ml',
-    competition_id: 'c5555555-5555-5555-5555-555555555555',
-    file_url: '/docs/guidebook-permifest-2026.pdf',
-    file_name: 'Regulasi_Turnamen_MLBB_2026.pdf',
-    file_size_bytes: 2600000,
-    version: 'v1.3',
-    description: 'Sistem draft pick 5v5, aturan skin & chat all, jatah pause teknis, struktur jadwal match penyisihan hingga grand final.',
-    release_notes: 'Klarifikasi toleransi keterlambatan tim maksimal 10 menit.',
-    is_published: true,
-    created_at: '2026-11-10T08:00:00Z',
-    updated_at: '2026-11-21T18:20:00Z',
   },
 ];
 

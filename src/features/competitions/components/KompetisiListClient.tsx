@@ -51,41 +51,43 @@ export function KompetisiListClient({ competitions }: Props) {
 
   return (
     <div className="space-y-8">
-      {/* Filter Tabs */}
-      <div className="flex justify-center">
-        <div className="inline-flex p-1 rounded-xl bg-muted/60 border border-border">
-          <button
-            onClick={() => setFilterType('all')}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
-              filterType === 'all'
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Semua Lomba ({competitions.length})
-          </button>
-          <button
-            onClick={() => setFilterType('academic')}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
-              filterType === 'academic'
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Akademik ({academicCount})
-          </button>
-          <button
-            onClick={() => setFilterType('non_academic')}
-            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
-              filterType === 'non_academic'
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            E-Sport ({nonAcademicCount})
-          </button>
+      {/* Filter Tabs (hanya tampil jika ada lebih dari 1 kategori) */}
+      {nonAcademicCount > 0 && (
+        <div className="flex justify-center">
+          <div className="inline-flex p-1 rounded-xl bg-muted/60 border border-border">
+            <button
+              onClick={() => setFilterType('all')}
+              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                filterType === 'all'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Semua Lomba ({competitions.length})
+            </button>
+            <button
+              onClick={() => setFilterType('academic')}
+              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                filterType === 'academic'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Akademik ({academicCount})
+            </button>
+            <button
+              onClick={() => setFilterType('non_academic')}
+              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                filterType === 'non_academic'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              E-Sport ({nonAcademicCount})
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Grid Perlombaan */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

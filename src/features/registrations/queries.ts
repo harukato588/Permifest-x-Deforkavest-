@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { createClient as createServerSupabase } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { requireUser, requirePermission } from '@/lib/auth/session';
 
 // ─── Tipe Data ────────────────────────────────────────────────────────────
@@ -89,7 +89,7 @@ function mapDbPayment(p: Record<string, unknown> | null): PaymentRow | null {
     id: String(p.id ?? ''),
     registration_id: String(p.registration_id ?? ''),
     status: (p.status as PaymentRow['status']) ?? 'awaiting_proof',
-    amount: Number(p.amount ?? 0),
+    amount: Number(p.amount_idr ?? p.amount ?? 0),
     proof_path: (p.proof_path as string) || null,
     proof_uploaded_at: (p.proof_uploaded_at as string) || null,
     reject_reason: (p.reject_reason as string) || null,
@@ -104,9 +104,9 @@ function mapDbPayment(p: Record<string, unknown> | null): PaymentRow | null {
 
 export async function getMyRegistrations(): Promise<RegistrationWithRelations[]> {
   const user = await requireUser();
-  const supabase = await createServerSupabase();
+  const admin = createAdminClient();
 
-  const { data, error } = await supabase
+  const { data, error } = await admin
     .from('registrations')
     .select(`
       id,
@@ -114,18 +114,18 @@ export async function getMyRegistrations(): Promise<RegistrationWithRelations[]>
       competition_id,
       status,
       form_data,
-      registered_at,
+      created_at,
       competitions (
         id, slug, name, fee_idr, participation, team_min, team_max,
         payment_qr_path, form_fields
       ),
       payments (
-        id, registration_id, status, amount, proof_path, proof_uploaded_at,
+        id, registration_id, status, amount_idr, proof_path, proof_uploaded_at,
         reject_reason, reviewed_by, reviewed_at, attempt, created_at
       )
     `)
     .eq('user_id', user.id)
-    .order('registered_at', { ascending: false });
+    .order('created_at', { ascending: false });
 
   if (error) {
     throw new Error(`Gagal mengambil data pendaftaran: ${error.message}`);
@@ -144,7 +144,7 @@ export async function getMyRegistrations(): Promise<RegistrationWithRelations[]>
       competition_id: String(r.competition_id ?? ''),
       status: (r.status as RegistrationWithRelations['status']) ?? 'draft',
       form_data: (r.form_data as Record<string, unknown>) ?? {},
-      registered_at: String(r.registered_at ?? ''),
+      registered_at: String(r.created_at ?? ''),
       competition: mapDbCompetition(compRaw),
       payment: mapDbPayment(payRaw),
     };
@@ -157,9 +157,9 @@ export async function getRegistrationById(
   id: string
 ): Promise<RegistrationWithRelations | null> {
   const user = await requireUser();
-  const supabase = await createServerSupabase();
+  const admin = createAdminClient();
 
-  const { data, error } = await supabase
+  const { data, error } = await admin
     .from('registrations')
     .select(`
       id,
@@ -167,13 +167,13 @@ export async function getRegistrationById(
       competition_id,
       status,
       form_data,
-      registered_at,
+      created_at,
       competitions (
         id, slug, name, fee_idr, participation, team_min, team_max,
         payment_qr_path, form_fields
       ),
       payments (
-        id, registration_id, status, amount, proof_path, proof_uploaded_at,
+        id, registration_id, status, amount_idr, proof_path, proof_uploaded_at,
         reject_reason, reviewed_by, reviewed_at, attempt, created_at
       )
     `)
@@ -198,7 +198,7 @@ export async function getRegistrationById(
     competition_id: String(r.competition_id ?? ''),
     status: (r.status as RegistrationWithRelations['status']) ?? 'draft',
     form_data: (r.form_data as Record<string, unknown>) ?? {},
-    registered_at: String(r.registered_at ?? ''),
+    registered_at: String(r.created_at ?? ''),
     competition: mapDbCompetition(compRaw),
     payment: mapDbPayment(payRaw),
   };
@@ -211,15 +211,15 @@ export async function getAllPaymentsForAdmin(filters?: {
   competitionId?: string;
 }): Promise<AdminPaymentRow[]> {
   await requirePermission('payments.verify');
-  const supabase = await createServerSupabase();
+  const admin = createAdminClient();
 
-  let query = supabase
+  let query = admin
     .from('payments')
     .select(`
       id,
       registration_id,
       status,
-      amount,
+      amount_idr,
       proof_path,
       proof_uploaded_at,
       reject_reason,
@@ -230,7 +230,7 @@ export async function getAllPaymentsForAdmin(filters?: {
         id,
         status,
         form_data,
-        registered_at,
+        created_at,
         competition_id,
         user_id,
         competitions (
@@ -271,13 +271,13 @@ export async function getAllPaymentsForAdmin(filters?: {
       competition_slug: String(comp?.slug ?? ''),
       registration_status: String(reg?.status ?? ''),
       payment_status: (p.status as AdminPaymentRow['payment_status']) ?? 'awaiting_proof',
-      amount: Number(p.amount ?? 0),
+      amount: Number(p.amount_idr ?? p.amount ?? 0),
       proof_path: (p.proof_path as string) || null,
       proof_uploaded_at: (p.proof_uploaded_at as string) || null,
       reject_reason: (p.reject_reason as string) || null,
       reviewed_by: (p.reviewed_by as string) || null,
       reviewed_at: (p.reviewed_at as string) || null,
-      registered_at: String(reg?.registered_at ?? ''),
+      registered_at: String(reg?.created_at ?? ''),
       form_data: (reg?.form_data as Record<string, unknown>) ?? {},
     };
   });

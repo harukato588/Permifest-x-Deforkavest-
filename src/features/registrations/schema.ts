@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 // ─── Skema Pendaftaran Kompetisi ───────────────────────────────────────────
 export const RegisterCompetitionSchema = z.object({
-  competition_id: z.string().uuid('ID kompetisi tidak valid.'),
+  competition_id: z.guid('ID kompetisi tidak valid.'),
   form_data: z.record(z.string(), z.unknown()).default({}),
   team_name: z.string().min(1).max(100).optional(),
   team_members: z

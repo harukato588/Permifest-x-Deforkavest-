@@ -72,11 +72,20 @@ export function TimelineSection({ id = 'jadwal' }: TimelineSectionProps) {
   const events = useMemo(() => (Array.isArray(rawEvents) ? rawEvents : []), [rawEvents]);
 
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
+  const [activeMonth, setActiveMonth] = useState<11 | 12>(12);
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'lomba' | 'event'>('all');
   const [selectedAgenda, setSelectedAgenda] = useState<AgendaItem | null>(null);
 
   // Ubah timelineEvents (tahapan lomba) ke AgendaItem
   const lombaAgendaList: AgendaItem[] = useMemo(() => {
+    const formatSingleDate = (iso: string) => {
+      const p = iso.split('-');
+      const yy = parseInt(p[0], 10) || 2026;
+      const mm = parseInt(p[1], 10) || 12;
+      const dd = parseInt(p[2], 10) || 1;
+      return `${dd} ${MONTH_NAMES[mm - 1] || 'Desember'} ${yy}`;
+    };
+
     return timelineEvents.map((ev: TimelineEvent) => {
       const parts = ev.tanggal_mulai.split('-');
       const y = parseInt(parts[0], 10) || 2026;
@@ -84,7 +93,10 @@ export function TimelineSection({ id = 'jadwal' }: TimelineSectionProps) {
       const d = parseInt(parts[2], 10) || 1;
 
       const meta = EVENT_TYPE_MAP[ev.jenis] || { stickerBg: '#E6C978', badgeType: 'Agenda Event' };
-      const dateFormatted = `${d} ${MONTH_NAMES[m - 1] || 'Desember'} ${y}`;
+      const startFormatted = formatSingleDate(ev.tanggal_mulai);
+      const dateFormatted = ev.tanggal_selesai
+        ? `${startFormatted.replace(` ${y}`, '')} - ${formatSingleDate(ev.tanggal_selesai)}`
+        : startFormatted;
 
       return {
         id: `tl-${ev.id}`,
@@ -93,6 +105,7 @@ export function TimelineSection({ id = 'jadwal' }: TimelineSectionProps) {
         month: m,
         year: y,
         isoDate: ev.tanggal_mulai,
+        endDateIso: ev.tanggal_selesai,
         title: ev.judul.replace(
           /^(Buka Pendaftaran: |Tutup Pendaftaran & Pembayaran: |Batas Pengumpulan Berkas: |Babak Final & Presentasi: )/,
           ''
@@ -166,11 +179,11 @@ export function TimelineSection({ id = 'jadwal' }: TimelineSectionProps) {
     });
   }, [lombaAgendaList, seminarAgendaList, categoryFilter]);
 
-  // Petakan event ke hari Desember 2026
+  // Petakan event ke hari pada bulan aktif (November / Desember 2026)
   const agendaMap = useMemo(() => {
     const map: Record<number, AgendaItem[]> = {};
     for (const a of unifiedAgendaList) {
-      if (a.month === 12 && a.year === 2026) {
+      if (a.month === activeMonth && a.year === 2026) {
         if (!map[a.day]) {
           map[a.day] = [];
         }
@@ -178,7 +191,10 @@ export function TimelineSection({ id = 'jadwal' }: TimelineSectionProps) {
       }
     }
     return map;
-  }, [unifiedAgendaList]);
+  }, [unifiedAgendaList, activeMonth]);
+
+  const leadingDays = activeMonth === 11 ? [26, 27, 28, 29, 30, 31] : [30];
+  const daysInMonth = activeMonth === 11 ? 30 : 31;
 
   // Handler Download .ics
   const handleDownloadIcs = (item: AgendaItem) => {
@@ -282,16 +298,34 @@ export function TimelineSection({ id = 'jadwal' }: TimelineSectionProps) {
 
       {viewMode === 'calendar' ? (
         <div className="rounded-2xl border border-[#2E2266] bg-[#140D33] p-4 sm:p-7 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
-          <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#2E2266]/70">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 pb-3 border-b border-[#2E2266]/70">
             <div>
               <p className="font-[family-name:var(--font-bricolage)] font-extrabold text-xl sm:text-2xl text-[#F5F2FF]">
-                Desember 2026
+                {MONTH_NAMES[activeMonth - 1]} 2026
               </p>
-              <p className="text-xs text-[#A99FD1]">Klik kotak tanggal untuk melihat pop-up rincian acara &amp; ekspor kalender</p>
+              <p className="text-xs text-[#A99FD1]">Klik kotak tanggal atau agenda untuk melihat rincian &amp; ekspor kalender</p>
             </div>
-            <span className="text-[11px] text-[#A99FD1] font-mono bg-[#0B0720] px-2.5 py-1 rounded-lg border border-[#2E2266]">
-              WIB (UTC+7)
-            </span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="inline-flex items-center p-1 rounded-xl bg-[#0B0720] border border-[#2E2266]">
+                {([11, 12] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => setActiveMonth(m)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                      activeMonth === m
+                        ? 'bg-[#9B6BF2] text-[#0B0720]'
+                        : 'text-[#A99FD1] hover:text-[#F5F2FF]'
+                    }`}
+                  >
+                    {MONTH_NAMES[m - 1]}
+                  </button>
+                ))}
+              </div>
+              <span className="text-[11px] text-[#A99FD1] font-mono bg-[#0B0720] px-2.5 py-1.5 rounded-lg border border-[#2E2266]">
+                WIB (UTC+7)
+              </span>
+            </div>
           </div>
 
           {/* Day Headers (Sen - Min) */}
@@ -305,14 +339,20 @@ export function TimelineSection({ id = 'jadwal' }: TimelineSectionProps) {
             <span className="text-[#D56BD9]">Min</span>
           </div>
 
-          {/* Grid Hari Desember 2026 (1 Des 2026 adalah Selasa => offset 1 sel di hari Senin) */}
+          {/* Grid Hari */}
           <div className="grid grid-cols-7 gap-1.5 sm:gap-2.5 select-none">
-            {/* Offset hari pertama: 30 Nov */}
-            <div className="min-h-[70px] sm:min-h-[96px] rounded-xl border border-transparent bg-[#140D33]/30 p-2 opacity-30 select-none">
-              <span className="font-[family-name:var(--font-jetbrains)] text-xs text-[#A99FD1]/40">30</span>
-            </div>
+            {leadingDays.map((prevDay) => (
+              <div
+                key={`prev-${prevDay}`}
+                className="min-h-[70px] sm:min-h-[96px] rounded-xl border border-transparent bg-[#140D33]/30 p-2 opacity-30 select-none"
+              >
+                <span className="font-[family-name:var(--font-jetbrains)] text-xs text-[#A99FD1]/40">
+                  {prevDay}
+                </span>
+              </div>
+            ))}
 
-            {Array.from({ length: 31 }).map((_, idx) => {
+            {Array.from({ length: daysInMonth }).map((_, idx) => {
               const day = idx + 1;
               const dayAgendas = agendaMap[day] || [];
               const primaryAgenda = dayAgendas[0];
@@ -326,7 +366,7 @@ export function TimelineSection({ id = 'jadwal' }: TimelineSectionProps) {
                   }}
                   className={`min-h-[70px] sm:min-h-[96px] rounded-xl border p-1.5 sm:p-2.5 transition-all duration-200 flex flex-col justify-between ${
                     hasEvents
-                      ? 'bg-[#18103c] border-[#7c4ddb]/70 hover:border-[#9B6BF2] hover:-translate-y-1 hover:rotate-[-0.8deg] hover:scale-[1.02] hover:shadow-[0_6px_20px_rgba(155,107,242,0.3)] cursor-pointer'
+                      ? 'bg-[#18103c] border-[#7c4ddb]/70 hover:border-[#9B6BF2] hover:-translate-y-1 hover:shadow-[0_6px_20px_rgba(155,107,242,0.3)] cursor-pointer'
                       : 'bg-[#140D33]/60 border-[#2E2266]/40'
                   }`}
                 >
@@ -340,23 +380,30 @@ export function TimelineSection({ id = 'jadwal' }: TimelineSectionProps) {
                     </span>
                     {dayAgendas.length > 1 && (
                       <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded-full bg-[#9B6BF2] text-[#0B0720]">
-                        +{dayAgendas.length}
+                        {dayAgendas.length}
                       </span>
                     )}
                   </div>
 
-                  {primaryAgenda && (
-                    <div className="mt-1">
-                      <span
-                        className="block px-1.5 py-1 rounded-lg text-[9px] sm:text-[11px] font-extrabold text-[#0B0720] truncate text-center leading-tight shadow-sm transition-transform hover:scale-105"
-                        style={{
-                          backgroundColor: primaryAgenda.stickerBg,
-                          transform: 'rotate(-1.5deg)',
-                        }}
-                        title={`${primaryAgenda.title} (${primaryAgenda.badgeType})`}
-                      >
-                        {primaryAgenda.title}
-                      </span>
+                  {dayAgendas.length > 0 && (
+                    <div className="mt-1 space-y-1">
+                      {dayAgendas.slice(0, 3).map((agenda) => (
+                        <button
+                          key={agenda.id}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedAgenda(agenda);
+                          }}
+                          className="w-full block px-1.5 py-0.5 sm:py-1 rounded-lg text-[9px] sm:text-[10px] font-extrabold text-[#0B0720] truncate text-center leading-tight shadow-sm transition-transform hover:scale-105 cursor-pointer"
+                          style={{
+                            backgroundColor: agenda.stickerBg,
+                          }}
+                          title={`${agenda.title} (${agenda.badgeType})`}
+                        >
+                          {agenda.title}
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>

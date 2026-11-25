@@ -16,28 +16,112 @@ import {
   IUserRepository,
 } from '../types';
 
+function mapCompetitionCategory(slug: string): Competition['category'] {
+  if (slug.includes('esai')) return 'esai';
+  if (slug.includes('uiux') || slug.includes('ui-ux')) return 'uiux';
+  if (slug.includes('it-system') || slug.includes('arsitektur')) return 'it_system_arch';
+  if (slug.includes('pes')) return 'pes';
+  if (slug.includes('ml') || slug.includes('mobile-legends')) return 'ml';
+  return 'esai';
+}
+
+function mapDbCompetition(row: Record<string, unknown>): Competition {
+  const slug = String(row.slug ?? '');
+  const rawFields = Array.isArray(row.form_fields) ? (row.form_fields as Array<Record<string, unknown>>) : [];
+  const rawSubConfig = (row.submission_config && typeof row.submission_config === 'object'
+    ? row.submission_config
+    : {}) as Record<string, unknown>;
+  const rawStages = Array.isArray(row.stages) ? (row.stages as Array<Record<string, unknown>>) : [];
+
+  const allowedTypes = Array.isArray(rawSubConfig.allowedTypes)
+    ? (rawSubConfig.allowedTypes as string[])
+    : Array.isArray(rawSubConfig.accepts)
+      ? (rawSubConfig.accepts as string[])
+      : [];
+
+  const maxSizeBytes =
+    typeof rawSubConfig.maxSizeBytes === 'number'
+      ? rawSubConfig.maxSizeBytes
+      : typeof rawSubConfig.max_mb === 'number'
+        ? rawSubConfig.max_mb * 1024 * 1024
+        : undefined;
+
+  return {
+    id: String(row.id ?? ''),
+    slug,
+    name: String(row.name ?? ''),
+    type: row.kind === 'esport' || row.type === 'non_academic' ? 'non_academic' : 'academic',
+    category: mapCompetitionCategory(slug),
+    participation_type:
+      row.participation === 'team' || row.participation_type === 'team' ? 'team' : 'individual',
+    min_team_size: Number(row.team_min ?? row.min_team_size ?? 1),
+    max_team_size: Number(row.team_max ?? row.max_team_size ?? 1),
+    description: String(row.description ?? ''),
+    theme: String(row.theme ?? 'Securing the Digital Frontier: Innovation & Resilience'),
+    registration_fee: Number(row.fee_idr ?? row.registration_fee ?? 0),
+    quota: row.quota != null ? Number(row.quota) : undefined,
+    registered_count: Number(row.registered_count ?? 0),
+    requires_identity_verification: Boolean(row.requires_identity ?? row.requires_identity_verification ?? true),
+    registration_open_at: String(row.registration_opens_at ?? row.registration_open_at ?? ''),
+    registration_close_at: String(row.registration_closes_at ?? row.registration_close_at ?? ''),
+    is_published: Boolean(row.is_published ?? true),
+    payment_qr_url: typeof row.payment_qr_url === 'string' ? row.payment_qr_url : undefined,
+    form_fields: rawFields.map((f) => ({
+      id: String(f.id ?? f.key ?? ''),
+      label: String(f.label ?? f.key ?? ''),
+      type: (f.type as Competition['form_fields'][number]['type']) ?? 'text',
+      placeholder: typeof f.placeholder === 'string' ? f.placeholder : undefined,
+      required: Boolean(f.required),
+      options: Array.isArray(f.options) ? (f.options as string[]) : undefined,
+    })),
+    submission_config: {
+      allowedTypes,
+      maxSizeBytes,
+      requiresDiagram: Boolean(rawSubConfig.requiresDiagram),
+      allowSeparateDiagram: Boolean(rawSubConfig.allowSeparateDiagram ?? rawSubConfig.allow_separate_diagram),
+    },
+    stages: rawStages
+      .map((s, idx) => ({
+        id: String(s.id ?? ''),
+        competition_id: String(s.competition_id ?? row.id ?? ''),
+        name: String(s.name ?? ''),
+        slug: String(s.slug ?? ''),
+        stage_order: Number(s.position ?? s.stage_order ?? idx + 1),
+        submission_open_at: String(s.opens_at ?? s.submission_open_at ?? ''),
+        submission_close_at: String(s.closes_at ?? s.submission_close_at ?? ''),
+        is_active: Boolean(s.is_active ?? idx === 0),
+      }))
+      .sort((a, b) => a.stage_order - b.stage_order),
+  };
+}
+
 export class SupabaseCompetitionRepository implements ICompetitionRepository {
   async getAll(): Promise<Competition[]> {
     const supabase = await createServerSupabase();
     const { data, error } = await supabase
       .from('competitions')
       .select('*, stages(*), rubric_criteria(*)')
-      .order('sort_order', { ascending: true });
+      .order('created_at', { ascending: true });
 
     if (error) throw new Error(error.message);
-    return (data || []) as unknown as Competition[];
+    return (data || []).map((row) => mapDbCompetition(row as unknown as Record<string, unknown>));
   }
 
   async getBySlug(slug: string): Promise<Competition | null> {
+    const slugAliasMap: Record<string, string> = {
+      'esai-ilmiah': 'esai',
+      'ui-ux-design': 'uiux',
+    };
+    const resolvedSlug = slugAliasMap[slug] || slug;
     const supabase = await createServerSupabase();
     const { data, error } = await supabase
       .from('competitions')
       .select('*, stages(*), rubric_criteria(*)')
-      .eq('slug', slug)
+      .eq('slug', resolvedSlug)
       .maybeSingle();
 
     if (error) throw new Error(error.message);
-    return (data as unknown as Competition) || null;
+    return data ? mapDbCompetition(data as unknown as Record<string, unknown>) : null;
   }
 
   async getById(id: string): Promise<Competition | null> {
@@ -49,7 +133,7 @@ export class SupabaseCompetitionRepository implements ICompetitionRepository {
       .maybeSingle();
 
     if (error) throw new Error(error.message);
-    return (data as unknown as Competition) || null;
+    return data ? mapDbCompetition(data as unknown as Record<string, unknown>) : null;
   }
 
   async create(data: Omit<Competition, 'id' | 'created_at' | 'updated_at'>): Promise<Competition> {

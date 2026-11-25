@@ -71,36 +71,6 @@ const DEFAULT_COMPETITIONS: CompetitionDisplayItem[] = [
     participationType: 'Individu (1 orang)',
     allowedFormat: 'Naskah Esai Ilmiah (.pdf, maks 15MB)',
   },
-  {
-    id: 'c4444444-4444-4444-4444-444444444444',
-    slug: 'pes',
-    name: 'eFootball PES 2026',
-    type: 'non_academic',
-    categoryType: 'sky',
-    categoryLabel: 'Non-akademik',
-    iconBg: '#6CC4FF',
-    desc: 'Turnamen sepak bola virtual konsol PlayStation kompetitif satu lawan satu.',
-    formatText: 'Individu · Offline PS Arena',
-    feeText: 'Rp 35.000',
-    registrationFee: 35000,
-    participationType: 'Individu (1 orang)',
-    allowedFormat: 'Penyisihan Grup & Bracket Knockout Offline',
-  },
-  {
-    id: 'c5555555-5555-5555-5555-555555555555',
-    slug: 'ml',
-    name: 'Mobile Legends: Bang Bang',
-    type: 'non_academic',
-    categoryType: 'sky',
-    categoryLabel: 'Non-akademik',
-    iconBg: '#F0A6F2',
-    desc: 'Turnamen 5v5 MLBB memperebutkan gelar penguasa Land of Dawn di arena Yogyakarta.',
-    formatText: 'Tim (5–6 orang) · Custom Draft',
-    feeText: 'Rp 100.000',
-    registrationFee: 100000,
-    participationType: 'Tim (5 pemain + 1 cadangan)',
-    allowedFormat: 'Turnamen Online & Main Event Offline UST',
-  },
 ];
 
 interface CompetitionsSectionProps {
@@ -153,8 +123,8 @@ export function CompetitionsSection({
         comp.submission_config?.allowedTypes?.length
           ? comp.submission_config.allowedTypes.join(', ')
           : isAcademic
-          ? 'Dokumen Proposal / Naskah PDF'
-          : 'Turnamen Bracket Match';
+            ? 'Dokumen Proposal / Naskah PDF'
+            : 'Turnamen Bracket Match';
 
       return {
         id: comp.id,
@@ -165,9 +135,8 @@ export function CompetitionsSection({
         categoryLabel: isAcademic ? 'Akademik' : 'Non-akademik',
         iconBg: bgPalettes[idx % bgPalettes.length],
         desc: comp.description || 'Kompetisi resmi mahasiswa Permifest x Deforkafest 2026.',
-        formatText: `${comp.participation_type === 'individual' ? 'Individu' : 'Tim'} · ${
-          isAcademic ? 'Karya Ilmiah/Desain' : 'E-Sport Arena'
-        }`,
+        formatText: `${comp.participation_type === 'individual' ? 'Individu' : 'Tim'} · ${isAcademic ? 'Karya Ilmiah/Desain' : 'E-Sport Arena'
+          }`,
         feeText: formatCurrency(comp.registration_fee),
         registrationFee: comp.registration_fee,
         participationType: partTypeLabel,
@@ -217,11 +186,10 @@ export function CompetitionsSection({
               {/* Category Pill Tag */}
               <div className="flex items-center justify-between mb-4 select-none">
                 <span
-                  className={`inline-block px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider ${
-                    comp.categoryType === 'gold'
-                      ? 'bg-[#2a2108] text-[#E6C978] border border-[#524112]/50'
-                      : 'bg-[#082436] text-[#6CC4FF] border border-[#144766]/50'
-                  }`}
+                  className={`inline-block px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider ${comp.categoryType === 'gold'
+                    ? 'bg-[#2a2108] text-[#E6C978] border border-[#524112]/50'
+                    : 'bg-[#082436] text-[#6CC4FF] border border-[#144766]/50'
+                    }`}
                 >
                   {comp.categoryLabel}
                 </span>
@@ -275,11 +243,10 @@ export function CompetitionsSection({
             {/* Header Modal */}
             <div className="flex items-center justify-between mb-3">
               <span
-                className={`inline-block px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider select-none ${
-                  selectedComp.categoryType === 'gold'
-                    ? 'bg-[#2a2108] text-[#E6C978]'
-                    : 'bg-[#082436] text-[#6CC4FF]'
-                }`}
+                className={`inline-block px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider select-none ${selectedComp.categoryType === 'gold'
+                  ? 'bg-[#2a2108] text-[#E6C978]'
+                  : 'bg-[#082436] text-[#6CC4FF]'
+                  }`}
               >
                 {selectedComp.categoryLabel}
               </span>

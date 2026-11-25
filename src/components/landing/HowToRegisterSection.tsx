@@ -17,7 +17,7 @@ interface HowToRegisterSectionProps {
 
 export function HowToRegisterSection({ id = 'panduan' }: HowToRegisterSectionProps) {
   const { competitions } = useAppStore();
-  const totalCompetitions = competitions.length || 5;
+  const totalCompetitions = competitions.length || 3;
 
   const STEPS: StepItem[] = [
     {
@@ -29,7 +29,7 @@ export function HowToRegisterSection({ id = 'panduan' }: HowToRegisterSectionPro
     {
       num: '02',
       title: 'Pilih Cabang Lomba',
-      desc: 'Pilih cabang akademik (Esai, UI/UX, IT Architecture) atau turnamen e-sport (PES 2026, Mobile Legends).',
+      desc: 'Pilih cabang lomba akademik (Esai Ilmiah, UI/UX Design, atau IT System Architecture) sesuai minat dan timmu.',
       highlight: `${totalCompetitions} Pilihan Cabang`,
     },
     {
