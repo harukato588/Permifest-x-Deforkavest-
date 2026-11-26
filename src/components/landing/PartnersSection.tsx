@@ -71,6 +71,7 @@ export function PartnersSection() {
                       alt={org.name}
                       width={160}
                       height={48}
+                      loading="lazy"
                       unoptimized
                       style={{ width: 'auto', height: 'auto' }}
                       className="max-h-12 max-w-[160px] object-contain transition-transform duration-300 group-hover:scale-105"

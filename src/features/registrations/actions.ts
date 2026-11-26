@@ -30,10 +30,14 @@ export async function registerCompetitionAction(
     const user = await requireUser();
     const parsed = RegisterCompetitionSchema.safeParse(raw);
     if (!parsed.success) {
+      const fieldErrors = parsed.error.flatten().fieldErrors as Record<string, string[]>;
+      const firstErrorMessage =
+        Object.entries(fieldErrors).map(([field, errs]) => `${field}: ${errs.join(', ')}`)[0] ||
+        'Data formulir tidak valid.';
       return {
         success: false,
-        error: 'Data formulir tidak valid.',
-        fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
+        error: `Data formulir tidak valid (${firstErrorMessage}).`,
+        fieldErrors,
       };
     }
 

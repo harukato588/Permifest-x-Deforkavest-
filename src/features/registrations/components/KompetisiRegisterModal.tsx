@@ -47,10 +47,11 @@ export function KompetisiRegisterModal({
     setErrorMessage(null);
 
     try {
+      const trimmedTeamName = teamName.trim();
       const result = await registerCompetitionAction({
         competition_id: comp.id,
         form_data: formData,
-        team_name: comp.participation_type === 'team' ? teamName : undefined,
+        team_name: comp.participation_type === 'team' && trimmedTeamName ? trimmedTeamName : undefined,
       });
 
       if (!result.success) {

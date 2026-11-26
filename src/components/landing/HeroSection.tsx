@@ -130,13 +130,14 @@ export function HeroSection() {
             </div>
 
             {/* Ilustrasi Maskot Utama (Megah & Halus Hover 3D) */}
-            <div className="w-full relative z-10 flex justify-center items-center transition-transform duration-300 ease-out group-hover:scale-[1.03] group-hover:-rotate-1">
+            <div className="w-full relative z-10 flex justify-center items-center">
               <Image
                 src="/ilustrasi.png"
                 alt="Ilustrasi Resmi Permifest x Deforkafest 2026"
                 width={640}
                 height={640}
-                priority
+                loading="lazy"
+                
                 className="w-full h-auto max-h-[520px] lg:max-h-[580px] object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.6)] select-none pointer-events-none"
               />
             </div>

@@ -159,7 +159,7 @@ export function EventsSection({ id = 'agenda' }: EventsSectionProps) {
           return (
             <article
               key={item.id}
-              className="group relative flex flex-col justify-between rounded-3xl border-2 border-[#2E2266] bg-[#140D33] p-6 shadow-[5px_5px_0px_#0B0720] hover:shadow-[7px_7px_0px_#0B0720,10px_10px_0px_#9B6BF2] hover:-translate-y-1 transition-all duration-200"
+              className="group relative flex flex-col justify-between rounded-3xl border-2 border-[#2E2266] bg-[#140D33] p-6 shadow-[5px_5px_0px_#0B0720] hover:shadow-[7px_7px_0px_#0B0720] hover:-translate-y-1 transition-[transform,border-color] duration-200"
             >
               <div>
                 {/* Badges Baris Atas */}

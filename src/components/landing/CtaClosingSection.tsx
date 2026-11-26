@@ -20,6 +20,7 @@ export function CtaClosingSection() {
             alt="Maskot Permifest x Deforkafest 2026"
             width={380}
             height={380}
+            loading="lazy"
             className="w-full h-auto max-h-[320px] object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.5)] pointer-events-none select-none transition-transform duration-300 hover:scale-105"
           />
         </div>

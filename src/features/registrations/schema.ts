@@ -2,14 +2,19 @@ import { z } from 'zod';
 
 // ─── Skema Pendaftaran Kompetisi ───────────────────────────────────────────
 export const RegisterCompetitionSchema = z.object({
-  competition_id: z.guid('ID kompetisi tidak valid.'),
+  competition_id: z.string().min(1, 'ID kompetisi tidak valid.'),
   form_data: z.record(z.string(), z.unknown()).default({}),
-  team_name: z.string().min(1).max(100).optional(),
+  team_name: z
+    .string()
+    .trim()
+    .max(100, 'Nama tim maksimal 100 karakter.')
+    .nullish()
+    .transform((v) => (v && v.length > 0 ? v : undefined)),
   team_members: z
     .array(
       z.object({
-        full_name: z.string().min(1),
-        email: z.string().email().optional(),
+        full_name: z.string().min(1, 'Nama anggota wajib diisi.'),
+        email: z.string().email('Format email anggota tidak valid.').optional(),
         institution: z.string().optional(),
       })
     )
