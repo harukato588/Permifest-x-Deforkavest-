@@ -13,9 +13,63 @@ import {
   DynamicFaqItem
 } from './types';
 
-export const MOCK_USERS: User[] = [];
+export const MOCK_USERS: User[] = [
+  {
+    id: 'usr-juri',
+    email: 'juri.cyber@permifest.id',
+    full_name: 'Dr. Hendra Gunawan (Juri Cyber)',
+    role: 'juri',
+    email_verified: true,
+  },
+  {
+    id: 'usr-peserta-1',
+    email: 'budi@uni.ac.id',
+    full_name: 'Budi Prasetyo',
+    role: 'peserta',
+    email_verified: true,
+  },
+  {
+    id: 'usr-peserta-2',
+    email: 'demo@gmail.com',
+    full_name: 'Siti Aminah',
+    role: 'peserta',
+    email_verified: true,
+  },
+  {
+    id: 'usr-peserta-3',
+    email: 'suti@permifest.id',
+    full_name: 'Susanti Dewi',
+    role: 'peserta',
+    email_verified: true,
+  },
+];
 
-export const MOCK_REGISTRATIONS: Registration[] = [];
+export const MOCK_REGISTRATIONS: Registration[] = [
+  {
+    id: 'reg-1',
+    user_id: 'usr-peserta-1',
+    competition_id: 'comp-1',
+    status: 'verified',
+    registered_at: '2026-11-25T10:00:00Z',
+    form_data: { asal_sekolah: 'UST Yogyakarta', nim_nisn: '20230101', subtema: 'Perlindungan Data Pribadi' },
+  },
+  {
+    id: 'reg-2',
+    user_id: 'usr-peserta-2',
+    competition_id: 'comp-2',
+    status: 'verified',
+    registered_at: '2026-11-25T11:00:00Z',
+    form_data: { asal_sekolah: 'UGM', nim_nisn: '20230202', subtema: 'Sistem Prediksi Kelulusan', figma_account: 'siti@figma.com' },
+  },
+  {
+    id: 'reg-3',
+    user_id: 'usr-peserta-3',
+    competition_id: 'comp-3',
+    status: 'verified',
+    registered_at: '2026-11-25T12:00:00Z',
+    form_data: { team_name: 'CyberVanguard', perguruan_tinggi: 'UST', subtema: 'Cloud Security Architecture' },
+  },
+];
 
 export const MOCK_RUBRIC_CRITERIA: RubricCriteria[] = [
   // Esai Criteria
@@ -31,9 +85,61 @@ export const MOCK_RUBRIC_CRITERIA: RubricCriteria[] = [
   { id: 'rubric-8', competition_id: 'comp-2', name: 'Security Design Awareness', description: 'Fitur keamanan yang ramah pengguna (2FA, alert, dll)', max_score: 100, weight: 0.15, sort_order: 4 },
 ];
 
-export const MOCK_SUBMISSIONS: Submission[] = [];
+export const MOCK_SUBMISSIONS: Submission[] = [
+  {
+    id: 'sub-1',
+    registration_id: 'reg-1',
+    stage_id: 'stage-1-1',
+    file_name: 'NSEC2026_Ketahanan_Siber_AI.pdf',
+    file_url: '/submissions/esai-karya-01.pdf',
+    submitted_at: '2026-11-25T14:30:00Z',
+    version: 1,
+    is_latest: true,
+  },
+  {
+    id: 'sub-2',
+    registration_id: 'reg-2',
+    stage_id: 'stage-2-1',
+    link_url: 'https://www.figma.com/design/demo-smart-campus-permifest',
+    submitted_at: '2026-11-25T15:00:00Z',
+    version: 1,
+    is_latest: true,
+  },
+  {
+    id: 'sub-3',
+    registration_id: 'reg-3',
+    stage_id: 'stage-3-1',
+    file_name: 'ITSA_Cloud_Hybrid_Resilience.pdf',
+    file_url: '/submissions/itsa-arsitektur-enterprise.pdf',
+    submitted_at: '2026-11-25T16:00:00Z',
+    version: 1,
+    is_latest: true,
+  },
+];
 
-export const MOCK_JUDGE_ASSIGNMENTS: JudgeAssignment[] = [];
+export const MOCK_JUDGE_ASSIGNMENTS: JudgeAssignment[] = [
+  {
+    id: 'assign-1',
+    judge_id: 'usr-juri',
+    submission_id: 'sub-1',
+    status: 'assigned',
+    assigned_at: '2026-11-25T14:35:00Z',
+  },
+  {
+    id: 'assign-2',
+    judge_id: 'usr-juri',
+    submission_id: 'sub-2',
+    status: 'in_progress',
+    assigned_at: '2026-11-25T15:05:00Z',
+  },
+  {
+    id: 'assign-3',
+    judge_id: 'usr-juri',
+    submission_id: 'sub-3',
+    status: 'completed',
+    assigned_at: '2026-11-25T16:05:00Z',
+  },
+];
 
 export const MOCK_MATCH_RESULTS: MatchResult[] = [];
 
