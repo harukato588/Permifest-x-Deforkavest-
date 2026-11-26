@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Input } from '@/components/ui/input';
@@ -11,8 +10,6 @@ import { SakugaButton } from '@/components/ui/sakuga-button';
 import { loginAction } from '@/features/auth/actions';
 
 export default function LoginPage() {
-  const router = useRouter();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -30,7 +27,13 @@ export default function LoginPage() {
         return;
       }
 
-      router.push(result.data.redirectUrl);
+      const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const redirectParam = params?.get('redirect');
+      const targetUrl = redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//')
+        ? redirectParam
+        : result.data.redirectUrl;
+
+      window.location.href = targetUrl;
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Terjadi kesalahan sistem';
       setErrorMessage(msg);

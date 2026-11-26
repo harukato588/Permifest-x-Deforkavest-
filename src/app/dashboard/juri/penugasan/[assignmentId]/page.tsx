@@ -5,6 +5,8 @@ import {
   getAssignedParticipantWorkDetail,
 } from '@/features/users/queries';
 
+export const instant = false;
+
 export default async function JuriAssignmentDetailPage({
   params,
 }: PageProps<'/dashboard/juri/penugasan/[assignmentId]'>) {

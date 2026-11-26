@@ -2,6 +2,8 @@ import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { ManagedParticipantsList } from '@/features/users/ManagedParticipantsList';
 import { getManagedParticipants } from '@/features/users/queries';
 
+export const instant = false;
+
 export default async function AdminPesertaPage() {
   const participants = await getManagedParticipants();
 

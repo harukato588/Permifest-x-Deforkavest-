@@ -2,6 +2,8 @@ import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { AssignedWorksList } from '@/features/users/AssignedWorksList';
 import { getAssignedParticipantWork } from '@/features/users/queries';
 
+export const instant = false;
+
 export default async function JuriPenugasanPage() {
   const works = await getAssignedParticipantWork();
 

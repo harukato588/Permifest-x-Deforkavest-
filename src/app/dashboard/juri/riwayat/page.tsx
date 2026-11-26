@@ -2,6 +2,8 @@ import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { AssignedWorksList } from '@/features/users/AssignedWorksList';
 import { getAssignedParticipantWork } from '@/features/users/queries';
 
+export const instant = false;
+
 export default async function JuriRiwayatPage() {
   const works = await getAssignedParticipantWork();
   const submittedWorks = works.filter((work) => work.status === 'submitted');

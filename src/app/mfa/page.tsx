@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation';
 import { connection } from 'next/server';
-import { MfaClient } from '@/features/auth/MfaClient';
 import { getCurrentUser } from '@/lib/auth/session';
 import { getDashboardPath } from '@/lib/auth/roles';
 

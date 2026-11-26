@@ -141,7 +141,7 @@ export async function getParticipantProfileData(): Promise<ParticipantProfileDat
 export async function getManagedParticipants(): Promise<ManagedParticipant[]> {
   await connection();
   await requirePermission('registrations.read');
-  const supabase = await createServerSupabase();
+  const supabase = createAdminClient();
   const pageSize = 500;
   const rows: unknown[] = [];
 
@@ -162,7 +162,12 @@ export async function getManagedParticipants(): Promise<ManagedParticipant[]> {
           institution,
           phone,
           education_level,
-          identity_verifications(id,document_type,status,note)
+          identity_verifications:identity_verifications!identity_verifications_user_id_fkey(
+            id,
+            document_type,
+            status,
+            note
+          )
         )
       `)
       .order('created_at', { ascending: false })
@@ -215,8 +220,8 @@ export async function getManagedParticipants(): Promise<ManagedParticipant[]> {
 export async function getAssignedParticipantWork(): Promise<AssignedParticipantWork[]> {
   await connection();
   const user = await requireRole(['juri']);
-  const supabase = await createServerSupabase();
-  const { data, error } = await supabase
+  const admin = createAdminClient();
+  const { data, error } = await admin
     .from('judge_assignments')
     .select(`
       id,
@@ -267,7 +272,7 @@ export async function getAssignedParticipantWorkDetail(
 export async function getManagedUsers(): Promise<ManagedUser[]> {
   await connection();
   await requirePermission('users.manage');
-  const supabase = await createServerSupabase();
+  const supabase = createAdminClient();
   const [{ data: users, error: usersError }, { data: assignments, error: assignmentsError }] =
     await Promise.all([
       supabase

@@ -334,8 +334,8 @@ export async function getAssignedSubmissionDownloadUrlAction(assignmentId: strin
     return { success: false, error: 'Penugasan tidak valid.' };
   }
 
-  const supabase = await createServerSupabase();
-  const { data: assignment, error: assignmentError } = await supabase
+  const admin = createAdminClient();
+  const { data: assignment, error: assignmentError } = await admin
     .from('judge_assignments')
     .select('submission:submissions!judge_assignments_submission_id_fkey(storage_path)')
     .eq('id', id.data)
@@ -352,7 +352,6 @@ export async function getAssignedSubmissionDownloadUrlAction(assignmentId: strin
     return { success: false, error: 'Karya tidak ditemukan atau bukan bagian dari penugasan kamu.' };
   }
 
-  const admin = createAdminClient();
   const { data, error } = await admin.storage
     .from('submissions')
     .createSignedUrl(storagePath, 300, { download: true });
