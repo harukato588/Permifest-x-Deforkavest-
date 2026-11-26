@@ -11,12 +11,5 @@ export default async function MfaPage() {
   const user = await getCurrentUser();
 
   if (!user) redirect('/login');
-  if (!user.roles.includes('super_admin')) redirect(getDashboardPath(user.role));
-  if (user.assurance_level === 'aal2') redirect('/dashboard/admin');
-
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-[var(--background)] px-4 py-12 text-[var(--foreground)]">
-      <MfaClient />
-    </main>
-  );
+  redirect(getDashboardPath(user.role));
 }

@@ -9,8 +9,5 @@ export default async function DashboardIndexPage() {
   await connection();
   const user = await getCurrentUser();
   if (!user) redirect('/login?redirect=%2Fdashboard');
-  if (user.roles.includes('super_admin') && user.assurance_level !== 'aal2') {
-    redirect('/mfa');
-  }
   redirect(getDashboardPath(user.role));
 }

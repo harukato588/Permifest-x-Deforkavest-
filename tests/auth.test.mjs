@@ -78,7 +78,7 @@ test('role routing uses the strongest assigned role and maps each dashboard', ()
   assert.equal(canAccessRoleArea(['peserta'], ['panitia', 'super_admin']), false);
   assert.equal(canAccessRoleArea(['juri'], ['juri']), true);
   assert.equal(canAccessRoleArea(['juri'], ['peserta']), false);
-  assert.equal(requiresSuperAdminMfa(['super_admin'], 'aal1'), true);
+  assert.equal(requiresSuperAdminMfa(['super_admin'], 'aal1'), false);
   assert.equal(requiresSuperAdminMfa(['super_admin'], 'aal2'), false);
   assert.equal(getDashboardPath('peserta'), '/dashboard/peserta');
   assert.equal(getDashboardPath('juri'), '/dashboard/juri');

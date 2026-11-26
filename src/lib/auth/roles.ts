@@ -17,10 +17,11 @@ export function canAccessRoleArea(
 }
 
 export function requiresSuperAdminMfa(
-  userRoles: readonly AppRole[],
-  assuranceLevel: 'aal1' | 'aal2' | null | undefined
+  _userRoles: readonly AppRole[],
+  _assuranceLevel: 'aal1' | 'aal2' | null | undefined
 ): boolean {
-  return userRoles.includes('super_admin') && assuranceLevel !== 'aal2';
+  // MFA dinonaktifkan untuk kelancaran operasional event (tidak ada lockout saat hari-H)
+  return false;
 }
 
 export function getDashboardPath(role: AppRole): string {
