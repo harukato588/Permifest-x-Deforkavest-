@@ -22,8 +22,8 @@ export function OrganizerStrip() {
           </div>
           <div className="inline-flex items-center rounded-xl overflow-hidden border border-[#2E2266] hover:border-[#7c4ddb] transition-colors">
             <Image
-              src="/brand/impsi-ust.svg"
-              alt="Logo IMPSI Prodi Sistem Informasi UST"
+              src="/brand/impsi-ust.png"
+              alt="Logo IMPSI Program Studi Informatika UST"
               width={160}
               height={48}
               className="h-10 w-auto object-contain"

@@ -132,7 +132,7 @@ export const MOCK_PARTNERS: import('./types').Partner[] = [
     id: 'partner-4',
     name: 'IMPSI UST Yogyakarta',
     category: 'organizer',
-    logo_url: '/brand/impsi-ust.svg',
+    logo_url: '/brand/impsi-ust.png',
     website_url: 'https://instagram.com/impsi_ust',
     description: 'Himpunan Mahasiswa Program Studi Informatika Universitas Sarjanawiyata Tamansiswa Yogyakarta.',
     tier: 'utama',
