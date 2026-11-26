@@ -22,8 +22,24 @@ interface AuditLogEntry {
 }
 
 export default function AdminAuditLogPage() {
-  const { auditLogs } = useAppStore();
+  const { currentUser, auditLogs } = useAppStore();
   const [selectedLog, setSelectedLog] = useState<AuditLogEntry | null>(null);
+
+  if (currentUser.role !== 'super_admin') {
+    return (
+      <DashboardLayout
+        title="Akses Dibatasi"
+        subtitle="Halaman ini membutuhkan hak akses Super Admin."
+      >
+        <Alert variant="destructive" icon={<ShieldCheck className="w-5 h-5" weight="bold" />}>
+          <AlertTitle>Akses Ditolak (403 Forbidden)</AlertTitle>
+          <AlertDescription>
+            Halaman Audit Trail hanya dapat diakses oleh akun dengan peran Super Admin sesuai aturan keamanan dan spesifikasi use case (RULE_16).
+          </AlertDescription>
+        </Alert>
+      </DashboardLayout>
+    );
+  }
 
   const getActionBadge = (action: string) => {
     if (action.includes('VERIFY')) return <Badge variant="success">{action}</Badge>;

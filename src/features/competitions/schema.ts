@@ -48,7 +48,7 @@ export const RubricCriterionSchema = z.object({
 });
 
 export const CompetitionUpsertSchema = z.object({
-  id: z.guid().optional(),
+  id: z.string().min(1).optional(),
   name: z.string().min(3, 'Nama kompetisi minimal 3 karakter'),
   slug: z
     .string()

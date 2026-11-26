@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const SubmitWorkSchema = z.object({
-  registration_id: z.guid('ID pendaftaran tidak valid.'),
-  stage_id: z.guid('ID tahapan tidak valid.'),
+  registration_id: z.string().min(1, 'ID pendaftaran tidak valid.'),
+  stage_id: z.string().min(1, 'ID tahapan tidak valid.'),
   kind: z.enum(['file', 'link']).default('file'),
   storage_path: z.string().min(5, 'Path berkas tidak valid.').optional(),
   original_filename: z.string().max(255).optional(),

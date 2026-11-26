@@ -213,14 +213,43 @@ export default function PesertaSubmissionPage() {
                             </div>
 
                             <div>
-                              <Button
-                                size="sm"
-                                variant="primary"
-                                leftIcon={<UploadSimple className="w-4 h-4" weight="bold" />}
-                                onClick={() => openSubmitModal(reg.id, stage.id)}
-                              >
-                                {stageSub ? `Unggah Versi Baru (v${stageSub.version + 1})` : 'Kumpul Karya'}
-                              </Button>
+                              {(() => {
+                                const isPaymentVerified =
+                                  reg.payment?.status === 'verified' ||
+                                  reg.status === 'verified';
+
+                                if (!isPaymentVerified) {
+                                  return (
+                                    <Button
+                                      size="sm"
+                                      variant="secondary"
+                                      disabled
+                                      title="Karya hanya dapat dikumpulkan setelah pembayaran diverifikasi oleh panitia."
+                                    >
+                                      Menunggu Verifikasi Bayar
+                                    </Button>
+                                  );
+                                }
+
+                                if (!stage.is_active) {
+                                  return (
+                                    <Button size="sm" variant="secondary" disabled>
+                                      Tahapan Belum Dibuka
+                                    </Button>
+                                  );
+                                }
+
+                                return (
+                                  <Button
+                                    size="sm"
+                                    variant="primary"
+                                    leftIcon={<UploadSimple className="w-4 h-4" weight="bold" />}
+                                    onClick={() => openSubmitModal(reg.id, stage.id)}
+                                  >
+                                    {stageSub ? `Unggah Versi Baru (v${stageSub.version + 1})` : 'Kumpul Karya'}
+                                  </Button>
+                                );
+                              })()}
                             </div>
                           </div>
 

@@ -58,9 +58,9 @@ export const ReviewKtmSchema = z
 
 export const GrantUserRoleSchema = z
   .object({
-    userId: z.guid(),
+    userId: z.string().min(1, 'ID pengguna tidak valid.'),
     role: z.enum(['juri', 'panitia', 'super_admin']),
-    competitionId: z.guid().optional(),
+    competitionId: z.string().min(1).optional(),
   })
   .refine((data) => data.role === 'super_admin' || Boolean(data.competitionId), {
     message: 'Pilih lomba untuk peran juri atau panitia.',

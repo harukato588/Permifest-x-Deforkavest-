@@ -135,9 +135,27 @@ export async function registerCompetitionAction(
       }
     }
 
-    // 5. Buat tim jika kompetisi beregu
+    // 5. Buat tim jika kompetisi beregu (RULE_02: Validasi kuota anggota tim)
     let teamId: string | null = null;
-    if (comp.participation === 'team' && team_name) {
+    if (comp.participation === 'team') {
+      if (!team_name) {
+        return { success: false, error: 'Nama tim wajib diisi untuk kompetisi beregu.' };
+      }
+
+      const totalMembers = 1 + (team_members ? team_members.length : 0);
+      if (comp.team_min && totalMembers < comp.team_min) {
+        return {
+          success: false,
+          error: `Jumlah anggota tim minimal ${comp.team_min} orang (termasuk ketua). Saat ini: ${totalMembers} orang.`,
+        };
+      }
+      if (comp.team_max && totalMembers > comp.team_max) {
+        return {
+          success: false,
+          error: `Jumlah anggota tim maksimal ${comp.team_max} orang (termasuk ketua). Saat ini: ${totalMembers} orang.`,
+        };
+      }
+
       const inviteCode = Math.random().toString(36).slice(2, 8).toUpperCase();
       const { data: team, error: teamErr } = await admin
         .from('teams')
