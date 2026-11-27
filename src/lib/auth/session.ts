@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { cache } from 'react';
 import { connection } from 'next/server';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
@@ -16,7 +17,7 @@ import {
 } from './roles';
 import { hasUserPermission } from './permissions';
 
-export async function getCurrentUser(): Promise<AuthSessionUser | null> {
+export const getCurrentUser = cache(async (): Promise<AuthSessionUser | null> => {
   if (!isSupabaseLive()) return null;
 
   const supabase = await createServerSupabase();
@@ -28,11 +29,20 @@ export async function getCurrentUser(): Promise<AuthSessionUser | null> {
   if (authError || !user?.email) return null;
 
   const admin = createAdminClient();
-  const { data: profileData, error: profileError } = await admin
-    .from('users')
-    .select('full_name, institution, phone, avatar_url, education_level')
-    .eq('id', user.id)
-    .maybeSingle();
+  const [
+    { data: profileData, error: profileError },
+    { data: assignments, error: assignmentsError },
+  ] = await Promise.all([
+    admin
+      .from('users')
+      .select('full_name, institution, phone, avatar_url, education_level')
+      .eq('id', user.id)
+      .maybeSingle(),
+    admin
+      .from('user_roles')
+      .select('role:roles!user_roles_role_id_fkey(key)')
+      .eq('user_id', user.id),
+  ]);
 
   if (profileError) throw new Error('Unable to load the authenticated user profile.');
   if (!profileData) return null;
@@ -49,36 +59,19 @@ export async function getCurrentUser(): Promise<AuthSessionUser | null> {
 
   if (!profile.success) throw new Error('The authenticated user profile is invalid.');
 
-  const { data: assignments, error: assignmentsError } = await admin
-    .from('user_roles')
-    .select('role_id')
-    .eq('user_id', user.id);
-
   if (assignmentsError) throw new Error('Unable to load the authenticated user roles.');
   if (!assignments.length) return null;
 
-  const { data: roleRows, error: rolesError } = await admin
-    .from('roles')
-    .select('key')
-    .in('id', assignments.map((assignment) => assignment.role_id));
+  const rawRoleKeys = assignments
+    .map((assignment) => {
+      const roleObj = Array.isArray(assignment.role) ? assignment.role[0] : assignment.role;
+      return (roleObj as { key?: string } | null)?.key;
+    })
+    .filter((key): key is string => Boolean(key));
 
-  if (rolesError) throw new Error('Unable to resolve the authenticated user roles.');
-
-  const roles = [...new Set(roleRows.map((row) => AppRoleSchema.parse(row.key)))];
+  const roles = [...new Set(rawRoleKeys.map((key) => AppRoleSchema.parse(key)))];
   const role = getPrimaryRole(roles);
   if (!role) return null;
-
-  let assuranceLevel: AuthSessionUser['assurance_level'] = null;
-  if (roles.includes('super_admin')) {
-    const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-    if (error) throw new Error('Unable to verify the Super Admin authentication level.');
-    assuranceLevel =
-      data.currentLevel === 'aal2'
-        ? 'aal2'
-        : data.currentLevel === 'aal1'
-          ? 'aal1'
-          : null;
-  }
 
   return {
     id: user.id,
@@ -91,9 +84,9 @@ export async function getCurrentUser(): Promise<AuthSessionUser | null> {
     education_level: profile.data.education_level,
     avatar_url: profile.data.avatar_url || '',
     is_verified: Boolean(user.email_confirmed_at),
-    assurance_level: assuranceLevel,
+    assurance_level: null,
   };
-}
+});
 
 export async function requireUser(): Promise<AuthSessionUser> {
   const user = await getCurrentUser();

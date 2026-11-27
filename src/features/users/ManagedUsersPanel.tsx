@@ -11,11 +11,13 @@ import { useAppStore } from '@/lib/store';
 import type { AppRole } from '@/lib/auth/types';
 import type { ManagedUser, RoleCompetitionOption } from './queries';
 import {
+  createUserAsAdminAction,
+  deleteUserAsAdminAction,
   grantUserRoleAction,
   revokeUserRoleAction,
   updateEducationLevelAsAdminAction,
 } from './actions';
-import { ShieldCheck, UserPlus, Users } from '@phosphor-icons/react';
+import { ShieldCheck, Trash, UserPlus, Users } from '@phosphor-icons/react';
 
 interface ManagedUsersPanelProps {
   initialUsers: ManagedUser[];
@@ -56,6 +58,11 @@ export function ManagedUsersPanel({ initialUsers, competitions }: ManagedUsersPa
   const router = useRouter();
   const { currentUser } = useAppStore();
   const [users, setUsers] = useState(initialUsers);
+  const [prevInitialUsers, setPrevInitialUsers] = useState(initialUsers);
+  if (initialUsers !== prevInitialUsers) {
+    setPrevInitialUsers(initialUsers);
+    setUsers(initialUsers);
+  }
   const [search, setSearch] = useState('');
   const [selectedUserId, setSelectedUserId] = useState('');
   const [selectedRole, setSelectedRole] = useState<'juri' | 'panitia' | 'super_admin'>('juri');
@@ -63,6 +70,13 @@ export function ManagedUsersPanel({ initialUsers, competitions }: ManagedUsersPa
   const [educationLevel, setEducationLevel] = useState('');
   const [busy, setBusy] = useState(false);
   const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [newFullName, setNewFullName] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newInstitution, setNewInstitution] = useState('');
+  const [newPhone, setNewPhone] = useState('');
+  const [newRole, setNewRole] = useState<AppRole>('juri');
+  const [newCompetitionId, setNewCompetitionId] = useState('');
 
   const visibleUsers = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -157,6 +171,63 @@ export function ManagedUsersPanel({ initialUsers, competitions }: ManagedUsersPa
   };
 
   const selectedUserCanChange = Boolean(selectedUser && selectedUser.id !== currentUser.id);
+  const newRoleNeedsCompetition = newRole === 'juri' || newRole === 'panitia';
+
+  const handleCreateUser = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setAlert(null);
+    setBusy(true);
+    try {
+      const result = await createUserAsAdminAction({
+        fullName: newFullName,
+        email: newEmail,
+        password: newPassword,
+        institution: newInstitution || undefined,
+        phone: newPhone || undefined,
+        role: newRole,
+        competitionId: newRoleNeedsCompetition ? newCompetitionId || undefined : undefined,
+      });
+      if (!result.success) {
+        setAlert({ type: 'error', message: result.error || 'Akun gagal dibuat.' });
+        return;
+      }
+      setNewFullName('');
+      setNewEmail('');
+      setNewPassword('');
+      setNewInstitution('');
+      setNewPhone('');
+      setNewCompetitionId('');
+      setAlert({ type: 'success', message: result.message || 'Akun berhasil dibuat.' });
+      router.refresh();
+    } catch {
+      setAlert({ type: 'error', message: 'Akun gagal dibuat. Muat ulang halaman lalu coba lagi.' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, label: string) => {
+    if (!window.confirm(`Hapus permanen akun "${label}"? Tindakan ini tidak dapat dibatalkan.`)) return;
+    setAlert(null);
+    setBusy(true);
+    try {
+      const result = await deleteUserAsAdminAction({ userId });
+      if (!result.success) {
+        setAlert({ type: 'error', message: result.error || 'Akun gagal dihapus.' });
+        return;
+      }
+      setUsers((current) => current.filter((user) => user.id !== userId));
+      if (selectedUserId === userId) {
+        setSelectedUserId('');
+      }
+      setAlert({ type: 'success', message: result.message || 'Akun berhasil dihapus.' });
+      router.refresh();
+    } catch {
+      setAlert({ type: 'error', message: 'Akun gagal dihapus. Muat ulang halaman lalu coba lagi.' });
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -166,6 +237,100 @@ export function ManagedUsersPanel({ initialUsers, competitions }: ManagedUsersPa
           <AlertDescription>{alert.message}</AlertDescription>
         </Alert>
       )}
+
+      <section className="rounded-lg border border-border bg-card p-4 sm:p-5">
+        <h2 className="flex items-center gap-2 text-base font-semibold text-foreground">
+          <UserPlus size={19} aria-hidden="true" />
+          Tambah pengguna baru
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Buat akun peserta, juri, panitia, atau super admin secara langsung tanpa perlu registrasi manual.
+        </p>
+        <form onSubmit={handleCreateUser} className="mt-4 grid gap-3 md:grid-cols-2">
+          <Input
+            label="Nama lengkap"
+            required
+            value={newFullName}
+            onChange={(event) => setNewFullName(event.target.value)}
+            placeholder="Contoh: Dr. Budi Santoso"
+          />
+          <Input
+            label="Alamat email"
+            type="email"
+            required
+            value={newEmail}
+            onChange={(event) => setNewEmail(event.target.value)}
+            placeholder="nama@domain.id"
+          />
+          <Input
+            label="Kata sandi awal"
+            type="password"
+            required
+            minLength={8}
+            value={newPassword}
+            onChange={(event) => setNewPassword(event.target.value)}
+            placeholder="Minimal 8 karakter dan mengandung angka"
+          />
+          <Input
+            label="Instansi / asal (opsional)"
+            value={newInstitution}
+            onChange={(event) => setNewInstitution(event.target.value)}
+            placeholder="Universitas / organisasi"
+          />
+          <Input
+            label="Nomor kontak / WhatsApp (opsional)"
+            value={newPhone}
+            onChange={(event) => setNewPhone(event.target.value)}
+            placeholder="08xxxxxxxxxx"
+          />
+          <div className="space-y-1.5">
+            <label htmlFor="new-user-role" className="block text-sm font-medium text-foreground">Peran awal</label>
+            <select
+              id="new-user-role"
+              value={newRole}
+              onChange={(event) => {
+                const role = event.target.value as AppRole;
+                setNewRole(role);
+                if (role === 'peserta' || role === 'super_admin') {
+                  setNewCompetitionId('');
+                }
+              }}
+              className="min-h-11 w-full cursor-pointer rounded-md border border-input bg-background px-3 text-sm text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              <option value="peserta">Peserta</option>
+              <option value="juri">Juri</option>
+              <option value="panitia">Panitia</option>
+              <option value="super_admin">Super admin</option>
+            </select>
+          </div>
+          {newRoleNeedsCompetition && (
+            <div className="space-y-1.5 md:col-span-2">
+              <label htmlFor="new-user-competition" className="block text-sm font-medium text-foreground">Cakupan lomba</label>
+              <select
+                id="new-user-competition"
+                required
+                value={newCompetitionId}
+                onChange={(event) => setNewCompetitionId(event.target.value)}
+                className="min-h-11 w-full cursor-pointer rounded-md border border-input bg-background px-3 text-sm text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              >
+                <option value="" disabled>Pilih lomba</option>
+                {competitions.map((competition) => (
+                  <option key={competition.id} value={competition.id}>{competition.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          <Button
+            type="submit"
+            variant="primary"
+            className="min-h-11 cursor-pointer md:col-span-2 md:justify-self-start"
+            disabled={busy || (newRoleNeedsCompetition && !newCompetitionId)}
+            isLoading={busy}
+          >
+            Buat pengguna
+          </Button>
+        </form>
+      </section>
 
       <section className="rounded-lg border border-border bg-card p-4 sm:p-5">
         <h2 className="flex items-center gap-2 text-base font-semibold text-foreground">
@@ -345,11 +510,23 @@ export function ManagedUsersPanel({ initialUsers, competitions }: ManagedUsersPa
                       ))}
                     </div>
                   </div>
-                  {user.id === currentUser.id && (
+                  {user.id === currentUser.id ? (
                     <p className="flex items-center gap-2 text-sm text-muted-foreground">
                       <ShieldCheck size={18} aria-hidden="true" />
-                      Akun aktif tidak dapat diubah dari halaman ini.
+                      Akun aktif tidak dapat diubah atau dihapus dari halaman ini.
                     </p>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="min-h-11 cursor-pointer text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      disabled={busy}
+                      onClick={() => handleDeleteUser(user.id, user.fullName || user.email || user.id)}
+                    >
+                      <Trash size={16} className="mr-1.5" aria-hidden="true" />
+                      Hapus akun
+                    </Button>
                   )}
                 </div>
               </li>

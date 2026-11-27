@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { EducationLevelSchema } from '@/features/auth/schema';
+import { EducationLevelSchema, NewPasswordSchema } from '@/features/auth/schema';
 import { BUCKET_RULES, isExtensionMimeMatching } from '@/features/storage/schema';
 
 const ktmFileFields = {
@@ -78,6 +78,54 @@ export const RevokeUserRoleSchema = z.object({
 export const UpdateEducationLevelAsAdminSchema = z.object({
   userId: z.string().uuid(),
   educationLevel: EducationLevelSchema,
+});
+
+export const CreateUserAsAdminSchema = z
+  .object({
+    fullName: z
+      .string()
+      .trim()
+      .min(2, 'Nama lengkap minimal 2 karakter.')
+      .max(120, 'Nama lengkap maksimal 120 karakter.'),
+    email: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .min(1, 'Email wajib diisi.')
+      .email('Format alamat email tidak valid.'),
+    password: NewPasswordSchema,
+    institution: z.string().trim().max(150, 'Instansi maksimal 150 karakter.').optional(),
+    phone: z
+      .string()
+      .trim()
+      .max(20, 'Nomor kontak maksimal 20 karakter.')
+      .regex(/^[0-9+\-\s]*$/, 'Format nomor kontak tidak valid.')
+      .optional(),
+    role: z.enum(['peserta', 'juri', 'panitia', 'super_admin']),
+    competitionId: z.string().uuid('Lomba tidak valid.').optional(),
+  })
+  .refine(
+    (data) =>
+      data.role === 'peserta' ||
+      data.role === 'super_admin' ||
+      Boolean(data.competitionId),
+    {
+      message: 'Pilih lomba untuk peran juri atau panitia.',
+      path: ['competitionId'],
+    },
+  )
+  .refine(
+    (data) =>
+      (data.role !== 'peserta' && data.role !== 'super_admin') ||
+      !data.competitionId,
+    {
+      message: 'Peran peserta dan super admin tidak menggunakan cakupan lomba.',
+      path: ['competitionId'],
+    },
+  );
+
+export const DeleteUserAsAdminSchema = z.object({
+  userId: z.string().uuid('ID pengguna tidak valid.'),
 });
 
 export type KtmUploadRequest = z.infer<typeof KtmUploadRequestSchema>;

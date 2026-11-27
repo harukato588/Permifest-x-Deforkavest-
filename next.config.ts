@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  experimental: {
+    optimizePackageImports: ['@phosphor-icons/react', 'lucide-react'],
+  },
   async headers() {
     return [
       {

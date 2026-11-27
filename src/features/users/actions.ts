@@ -9,6 +9,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { isExtensionMimeMatching, sanitizeFilename } from '@/features/storage/schema';
 import { z } from 'zod';
 import {
+  CreateUserAsAdminSchema,
+  DeleteUserAsAdminSchema,
   GrantUserRoleSchema,
   KtmUploadConfirmationSchema,
   KtmUploadRequestSchema,
@@ -627,4 +629,183 @@ export async function updateEducationLevelAsAdminAction(rawInput: unknown) {
   revalidatePath('/dashboard/admin/pengguna');
   revalidatePath('/dashboard/admin/peserta');
   return { success: true, message: 'Status pendidikan peserta berhasil diperbarui.' };
+}
+
+export async function createUserAsAdminAction(rawInput: unknown) {
+  const parsed = CreateUserAsAdminSchema.safeParse(rawInput);
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message || 'Data akun tidak valid.' };
+  }
+
+  const actor = await requirePermission('users.manage');
+  const admin = createAdminClient();
+
+  const { data: existingUser } = await admin
+    .from('users')
+    .select('id')
+    .eq('email', parsed.data.email)
+    .is('deleted_at', null)
+    .maybeSingle();
+
+  if (existingUser) {
+    return { success: false, error: 'Email tersebut sudah terdaftar.' };
+  }
+
+  if (parsed.data.competitionId) {
+    const { data: competition, error: competitionError } = await admin
+      .from('competitions')
+      .select('id')
+      .eq('id', parsed.data.competitionId)
+      .maybeSingle();
+    if (competitionError || !competition) {
+      return { success: false, error: 'Lomba yang dipilih tidak ditemukan.' };
+    }
+  }
+
+  const { data: roleRow, error: roleError } = await admin
+    .from('roles')
+    .select('id')
+    .eq('key', parsed.data.role)
+    .maybeSingle();
+  if (roleError || !roleRow) {
+    return { success: false, error: 'Peran yang dipilih tidak ditemukan.' };
+  }
+
+  const { data: created, error: createError } = await admin.auth.admin.createUser({
+    email: parsed.data.email,
+    password: parsed.data.password,
+    email_confirm: true,
+    user_metadata: {
+      full_name: parsed.data.fullName,
+      institution: parsed.data.institution || null,
+      phone: parsed.data.phone || null,
+    },
+  });
+
+  if (createError || !created.user) {
+    const isDuplicate = createError?.message?.toLowerCase().includes('already');
+    return {
+      success: false,
+      error: isDuplicate ? 'Email tersebut sudah terdaftar.' : 'Akun gagal dibuat. Coba lagi.',
+    };
+  }
+
+  const newUserId = created.user.id;
+  await admin.from('users').upsert(
+    {
+      id: newUserId,
+      full_name: parsed.data.fullName,
+      email: parsed.data.email,
+      institution: parsed.data.institution || null,
+      phone: parsed.data.phone || null,
+    },
+    { onConflict: 'id' },
+  );
+
+  if (parsed.data.role !== 'peserta') {
+    const { error: grantError } = await admin.from('user_roles').insert({
+      user_id: newUserId,
+      role_id: roleRow.id,
+      competition_id: parsed.data.competitionId ?? null,
+      granted_by: actor.id,
+    });
+    if (grantError) {
+      await admin.auth.admin.deleteUser(newUserId);
+      return { success: false, error: 'Akun gagal diberikan peran awal. Coba lagi.' };
+    }
+  }
+
+  await admin.from('audit_logs').insert({
+    actor_id: actor.id,
+    actor_role: actor.role,
+    action: 'user.create',
+    entity_type: 'users',
+    entity_id: newUserId,
+    competition_id: parsed.data.competitionId ?? null,
+    payload: {
+      email: parsed.data.email,
+      role: parsed.data.role,
+    },
+  });
+
+  revalidatePath('/dashboard/admin/pengguna');
+  return {
+    success: true,
+    message: `Akun ${parsed.data.fullName} (${parsed.data.email}) berhasil dibuat.`,
+    userId: newUserId,
+  };
+}
+
+export async function deleteUserAsAdminAction(rawInput: unknown) {
+  const parsed = DeleteUserAsAdminSchema.safeParse(rawInput);
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message || 'ID pengguna tidak valid.' };
+  }
+
+  const actor = await requirePermission('users.manage');
+  if (parsed.data.userId === actor.id) {
+    return { success: false, error: 'Kamu tidak dapat menghapus akun yang sedang digunakan.' };
+  }
+
+  const admin = createAdminClient();
+  const { data: target, error: targetError } = await admin
+    .from('users')
+    .select('id,email,full_name,deleted_at')
+    .eq('id', parsed.data.userId)
+    .maybeSingle();
+
+  if (targetError || !target || target.deleted_at) {
+    return { success: false, error: 'Akun pengguna tidak ditemukan.' };
+  }
+
+  const { data: superAdminRole } = await admin
+    .from('roles')
+    .select('id')
+    .eq('key', 'super_admin')
+    .maybeSingle();
+
+  if (superAdminRole) {
+    const { data: targetIsSuperAdmin } = await admin
+      .from('user_roles')
+      .select('id')
+      .eq('user_id', parsed.data.userId)
+      .eq('role_id', superAdminRole.id)
+      .is('competition_id', null)
+      .maybeSingle();
+
+    if (targetIsSuperAdmin) {
+      const { count } = await admin
+        .from('user_roles')
+        .select('id', { count: 'exact', head: true })
+        .eq('role_id', superAdminRole.id)
+        .is('competition_id', null);
+      if ((count ?? 0) <= 1) {
+        return { success: false, error: 'Akun super admin terakhir tidak dapat dihapus.' };
+      }
+    }
+  }
+
+  const { error: deleteError } = await admin.auth.admin.deleteUser(parsed.data.userId);
+  if (deleteError) {
+    return {
+      success: false,
+      error: 'Akun gagal dihapus karena masih memiliki data terkait (pendaftaran/penilaian).',
+    };
+  }
+
+  await admin.from('audit_logs').insert({
+    actor_id: actor.id,
+    actor_role: actor.role,
+    action: 'user.delete',
+    entity_type: 'users',
+    entity_id: parsed.data.userId,
+    payload: {
+      email: target.email,
+      full_name: target.full_name,
+    },
+  });
+
+  revalidatePath('/dashboard/admin/pengguna');
+  revalidatePath('/dashboard/admin/peserta');
+  return { success: true, message: `Akun ${target.full_name || target.email} berhasil dihapus.` };
 }
