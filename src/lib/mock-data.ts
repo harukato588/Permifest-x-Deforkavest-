@@ -217,7 +217,7 @@ export const MOCK_PARTNERS: import('./types').Partner[] = [
     name: 'Kabinet Nawasena',
     category: 'kabinet',
     logo_url: '/brand/logo kabinet.jpeg',
-    website_url: 'https://instagram.com/permikomnas.diy',
+    website_url: 'https://www.instagram.com/permikomnas_yogyakarta/',
     description: 'Kabinet kepengurusan resmi Permikomnas Wilayah VII DIY periode berjalan yang mengusung sinergi dan inovasi.',
     tier: 'utama',
     order_index: 2,
