@@ -184,7 +184,15 @@ export function AppProvider({
   const [systemSettings, setSystemSettings] = useState<SystemSettings>(DEFAULT_SYSTEM_SETTINGS);
   const [scoreChanges, setScoreChanges] = useState<ScoreChange[]>([]);
   const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>(() => getTimelineEvents());
-  const [partners, setPartners] = useState<Partner[]>(MOCK_PARTNERS);
+  const [partners, setPartners] = useState<Partner[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('permifest_partners');
+        if (saved) return JSON.parse(saved);
+      } catch {}
+    }
+    return MOCK_PARTNERS;
+  });
   const [guidebooks, setGuidebooks] = useState<Guidebook[]>(MOCK_GUIDEBOOKS);
   const [events, setEvents] = useState<EventItem[]>(MOCK_EVENTS);
   const [faqs, setFaqs] = useState<DynamicFaqItem[]>(MOCK_FAQS);
@@ -773,23 +781,47 @@ export function AppProvider({
       ...p,
       id: `partner-${Date.now()}`,
     };
-    setPartners(prev => [...prev, newPartner]);
+    setPartners(prev => {
+      const next = [...prev, newPartner];
+      if (typeof window !== 'undefined') {
+        try { localStorage.setItem('permifest_partners', JSON.stringify(next)); } catch {}
+      }
+      return next;
+    });
     logAudit('ADD_PARTNER', 'partner', newPartner.id, { name: p.name, category: p.category });
     return newPartner;
   };
 
   const updatePartner = async (id: string, updates: Partial<Partner>): Promise<void> => {
-    setPartners(prev => prev.map(p => (p.id === id ? { ...p, ...updates } : p)));
+    setPartners(prev => {
+      const next = prev.map(p => (p.id === id ? { ...p, ...updates } : p));
+      if (typeof window !== 'undefined') {
+        try { localStorage.setItem('permifest_partners', JSON.stringify(next)); } catch {}
+      }
+      return next;
+    });
     logAudit('UPDATE_PARTNER', 'partner', id, updates);
   };
 
   const deletePartner = async (id: string): Promise<void> => {
-    setPartners(prev => prev.filter(p => p.id !== id));
+    setPartners(prev => {
+      const next = prev.filter(p => p.id !== id);
+      if (typeof window !== 'undefined') {
+        try { localStorage.setItem('permifest_partners', JSON.stringify(next)); } catch {}
+      }
+      return next;
+    });
     logAudit('DELETE_PARTNER', 'partner', id, { id });
   };
 
   const togglePartnerActive = async (id: string): Promise<void> => {
-    setPartners(prev => prev.map(p => (p.id === id ? { ...p, is_active: !p.is_active } : p)));
+    setPartners(prev => {
+      const next = prev.map(p => (p.id === id ? { ...p, is_active: !p.is_active } : p));
+      if (typeof window !== 'undefined') {
+        try { localStorage.setItem('permifest_partners', JSON.stringify(next)); } catch {}
+      }
+      return next;
+    });
     logAudit('TOGGLE_PARTNER_ACTIVE', 'partner', id, {});
   };
 
