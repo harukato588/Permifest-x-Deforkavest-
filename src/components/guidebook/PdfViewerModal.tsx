@@ -21,12 +21,53 @@ interface PdfViewerModalProps {
 export function PdfViewerModal({ guidebook, isOpen, onClose }: PdfViewerModalProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [loadError, setLoadError] = useState(false);
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
 
   const handleClose = useCallback(() => {
     setIsFullscreen(false);
     setLoadError(false);
     onClose();
   }, [onClose]);
+
+  // Fetch PDF lokal sebagai Blob URL agar tidak diblokir oleh X-Frame-Options / cache browser
+  useEffect(() => {
+    if (!isOpen || !guidebook?.file_url || !guidebook.file_url.startsWith('/')) {
+      return;
+    }
+
+    const controller = new AbortController();
+    let objectUrl: string | null = null;
+
+    const loadPdf = async () => {
+      try {
+        const res = await fetch(guidebook.file_url, {
+          signal: controller.signal,
+          cache: 'no-store',
+        });
+        if (!res.ok) throw new Error('Failed to load PDF');
+        const rawBlob = await res.blob();
+        const pdfBlob = new Blob([rawBlob], { type: 'application/pdf' });
+        objectUrl = URL.createObjectURL(pdfBlob);
+        if (!controller.signal.aborted) {
+          setLoadError(false);
+          setBlobUrl(objectUrl);
+        }
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError' && !controller.signal.aborted) {
+          setLoadError(true);
+        }
+      }
+    };
+
+    void loadPdf();
+
+    return () => {
+      controller.abort();
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [isOpen, guidebook?.file_url]);
 
   // Tangani tombol ESC untuk menutup modal
   useEffect(() => {
@@ -46,6 +87,9 @@ export function PdfViewerModal({ guidebook, isOpen, onClose }: PdfViewerModalPro
   }, [isOpen, handleClose]);
 
   if (!isOpen || !guidebook) return null;
+
+  const isLocalPdf = guidebook.file_url.startsWith('/');
+  const viewerSrc = isLocalPdf ? blobUrl : guidebook.file_url;
 
   const formatFileSize = (bytes?: number) => {
     if (!bytes) return 'PDF';
@@ -187,9 +231,14 @@ export function PdfViewerModal({ guidebook, isOpen, onClose }: PdfViewerModalPro
                 </a>
               </div>
             </div>
+          ) : !viewerSrc ? (
+            <div className="p-8 text-center space-y-3">
+              <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto" />
+              <p className="text-xs text-muted-foreground">Memuat dokumen PDF...</p>
+            </div>
           ) : (
             <iframe
-              src={`${guidebook.file_url}#toolbar=1&navpanes=0`}
+              src={`${viewerSrc}#toolbar=1&navpanes=0`}
               title={guidebook.title}
               className="w-full h-full border-none select-auto"
               onError={() => setLoadError(true)}

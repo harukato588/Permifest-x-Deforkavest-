@@ -72,7 +72,7 @@ VALUES (
   'academic',
   'individual',
   'Kompetisi esai bertema inovasi dan ketahanan keamanan siber.',
-  50000.00, -- [PLACEHOLDER]
+  25000.00, -- [PLACEHOLDER]
   100,
   1, 1, 0,
   TRUE,
@@ -106,7 +106,7 @@ VALUES (
   'academic',
   'individual',
   'Perancangan antarmuka dan pengalaman pengguna untuk aplikasi cybersecurity modern.',
-  75000.00, -- [PLACEHOLDER]
+  25000.00, -- [PLACEHOLDER]
   75,
   1, 1, 0,
   TRUE,
@@ -139,7 +139,7 @@ VALUES (
   'academic',
   'individual',
   'Perancangan arsitektur sistem IT enterprise yang tangguh, terukur, dan aman.',
-  100000.00, -- [PLACEHOLDER]
+  50000.00, -- [PLACEHOLDER]
   50,
   1, 1, 0,
   TRUE,

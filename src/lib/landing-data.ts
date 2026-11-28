@@ -354,7 +354,7 @@ export function getFaqItems(): FaqItem[] {
 export function getOrganizers(): OrganizerInfo[] {
   return [
     {
-      name: 'Permikomnas Wilayah V DIY',
+      name: 'Permikomnas Wilayah VIII DIY',
       role: 'Penyelenggara Bersama',
       isPlaceholder: true,
     },

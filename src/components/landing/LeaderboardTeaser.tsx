@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { SakugaButton } from '@/components/ui/sakuga-button';
 
 export function LeaderboardTeaser() {
   return (
@@ -72,27 +71,6 @@ export function LeaderboardTeaser() {
             Arena UST Yogyakarta
           </div>
         </div>
-      </div>
-
-      {/* Callout Status Leaderboard Live (Arkavidia Style) */}
-      <div className="mt-12 max-w-4xl mx-auto p-5 sm:p-6 rounded-2xl bg-[#0B0720] border border-[#2E2266] flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-        <div>
-          <span className="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#140D33] text-[#C4F15A] border border-[#2E2266] mb-1">
-            Status: Papan Peringkat Live
-          </span>
-          <p className="text-xs sm:text-sm text-[#A99FD1]">
-            Klasemen peringkat interaktif akan dibuka secara live saat babak penjurian final dimulai pada <strong className="text-[#F5F2FF]">Desember 2026</strong>.
-          </p>
-        </div>
-
-        <SakugaButton
-          href="/leaderboard"
-          variant="secondary"
-          size="sm"
-          className="shrink-0 border-[#2E2266]"
-        >
-          Lihat Simulasi Leaderboard
-        </SakugaButton>
       </div>
     </section>
   );
