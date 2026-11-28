@@ -443,8 +443,8 @@ export default function AdminMitraPage() {
         title={editingPartnerId ? 'Ubah Informasi Mitra' : 'Tambah Mitra / Sponsor Baru'}
         description="Kelola profil instansi mitra, kategori, serta tautan atau upload file logo resmi."
       >
-        <form onSubmit={handleSubmit} className="flex-1 flex flex-col justify-between">
-          <DrawerContent className="space-y-4">
+        <form onSubmit={handleSubmit} className="flex-1 min-h-0 flex flex-col overflow-hidden">
+          <DrawerContent className="space-y-4 flex-1 overflow-y-auto">
             {drawerError && (
               <Alert variant="destructive">
                 <AlertDescription>{drawerError}</AlertDescription>
@@ -655,7 +655,7 @@ export default function AdminMitraPage() {
             </div>
           </DrawerContent>
 
-          <DrawerFooter>
+          <DrawerFooter className="p-4 sm:p-5 border-t border-border flex flex-row items-center justify-end gap-3 bg-card shrink-0">
             <Button
               type="button"
               variant="outline"

@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     template: '%s | Permifest x Deforkafest 2026',
   },
   description:
-    'Platform perlombaan satu pintu Permifest x Deforkafest (Permikomnas Yogyakarta x IMPSI UST Yogyakarta). 3 Cabang Lomba Akademik: Esai Ilmiah, UI/UX Design, dan IT System Architecture, serta cabang E-Sport.',
+    'Platform perlombaan satu pintu Permifest x Deforkafest (Permikomnas Yogyakarta x IMPSI UST Yogyakarta). 3 Cabang Lomba Akademik: Esai Ilmiah, UI/UX Design, dan IT System Architecture.',
   keywords: [
     'Permifest',
     'Deforkafest',
@@ -44,8 +44,6 @@ export const metadata: Metadata = {
     'Lomba UI/UX',
     'Lomba Esai Ilmiah',
     'IT System Architecture',
-    'Mobile Legends Tournament',
-    'PES eFootball',
     'Yogyakarta 2026',
   ],
   authors: [{ name: 'Panitia Permifest x Deforkafest 2026' }],
@@ -61,7 +59,7 @@ export const metadata: Metadata = {
     siteName: 'Permifest x Deforkafest 2026',
     title: 'Permifest x Deforkafest 2026 — Kompetisi IT & Agenda Akbar Nasional',
     description:
-      'Daftarkan timmu sekarang! 5 cabang perlombaan bergengsi, e-sertifikat nasional, dan panggung final kompetisi teknologi.',
+      'Daftarkan timmu sekarang! 3 cabang perlombaan akademik bergengsi, e-sertifikat nasional, dan panggung final kompetisi teknologi.',
     images: [
       {
         url: '/ilustrasi.png',

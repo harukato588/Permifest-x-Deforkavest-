@@ -317,7 +317,7 @@ export function getFaqItems(): FaqItem[] {
       id: 'faq-4',
       pertanyaan: 'Apakah anggota tim harus berasal dari kampus yang sama?',
       jawaban:
-        'Untuk cabang lomba beregu (IT System Architecture dan Mobile Legends), anggota tim diperbolehkan berasal dari jurusan yang berbeda namun tetap dalam satu institusi/kampus yang sama.',
+        'Untuk cabang lomba beregu (IT System Architecture dan Esai Tim), anggota tim diperbolehkan berasal dari jurusan yang berbeda namun tetap dalam satu institusi/kampus yang sama.',
       kategori: 'kompetisi',
     },
     {
@@ -338,7 +338,7 @@ export function getFaqItems(): FaqItem[] {
       id: 'faq-7',
       pertanyaan: 'Apakah setiap peserta akan mendapatkan sertifikat?',
       jawaban:
-        'Ya, seluruh peserta yang mengumpulkan karya lengkap atau hadir bertanding akan mendapatkan e-sertifikat nasional ber-SK resmi dari Permikomnas DIY & IMPSI UST.',
+        'Ya, seluruh peserta yang mengumpulkan karya lengkap akan mendapatkan e-sertifikat nasional ber-SK resmi dari Permikomnas DIY & IMPSI UST.',
       kategori: 'pendaftaran',
     },
   ];

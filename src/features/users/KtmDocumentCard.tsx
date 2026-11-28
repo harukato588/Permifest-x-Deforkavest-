@@ -34,10 +34,20 @@ export function KtmDocumentCard({ verification: initialVerification }: KtmDocume
     setIsUploading(true);
 
     try {
+      const effectiveMimeType = file.type || (
+        file.name.toLowerCase().endsWith('.pdf')
+          ? 'application/pdf'
+          : file.name.toLowerCase().endsWith('.png')
+            ? 'image/png'
+            : file.name.toLowerCase().endsWith('.webp')
+              ? 'image/webp'
+              : 'image/jpeg'
+      );
+
       const signed = await createKtmUploadUrlAction({
         originalFilename: file.name,
         fileSizeBytes: file.size,
-        mimeType: file.type,
+        mimeType: effectiveMimeType,
       });
       if (!signed.success || !signed.data) {
         setErrorMessage(signed.error || 'Tautan unggah gagal dibuat. Coba lagi.');
@@ -46,7 +56,7 @@ export function KtmDocumentCard({ verification: initialVerification }: KtmDocume
 
       const uploadResponse = await fetch(signed.data.signedUrl, {
         method: 'PUT',
-        headers: { 'Content-Type': file.type },
+        headers: { 'Content-Type': effectiveMimeType },
         body: file,
       });
       if (!uploadResponse.ok) {
@@ -58,7 +68,7 @@ export function KtmDocumentCard({ verification: initialVerification }: KtmDocume
         storagePath: signed.data.storagePath,
         originalFilename: file.name,
         fileSizeBytes: file.size,
-        mimeType: file.type,
+        mimeType: effectiveMimeType,
       });
       if (!confirmed.success) {
         setErrorMessage(confirmed.error || 'KTM gagal dikonfirmasi. Coba unggah ulang.');

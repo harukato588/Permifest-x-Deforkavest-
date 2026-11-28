@@ -162,7 +162,7 @@ export default function PesertaSubmissionPage() {
           <EmptyState
             icon={<FileText className="w-7 h-7 text-[var(--primary)]" weight="duotone" />}
             title="Tidak Ada Kompetisi Berbasis Karya"
-            description="Anda belum mendaftar di cabang lomba akademik (Esai, UI/UX, IT Architecture). Lomba e-sport (PES & Mobile Legends) tidak memerlukan pengumpulan berkas karya."
+            description="Anda belum mendaftar di cabang lomba akademik (Esai, UI/UX, IT Architecture). Silakan mendaftar terlebih dahulu."
           />
         ) : (
           myAcademicRegistrations.map((reg) => {

@@ -238,7 +238,7 @@ export default function AdminOverviewPage() {
                       className="h-full bg-[var(--accent-foreground)] rounded-full transition-all duration-300"
                     />
                   </div>
-                  <p className="text-[10px] text-[var(--muted-foreground)] mt-1">Mobile Legends: Bang Bang &amp; eFootball PES</p>
+                  <p className="text-[10px] text-[var(--muted-foreground)] mt-1">Esai, UI/UX Design &amp; IT System Architecture</p>
                 </div>
               </CardContent>
             </Card>

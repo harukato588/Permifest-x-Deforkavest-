@@ -95,7 +95,7 @@ export default function RegisterPage() {
       >
         <div className="px-4 py-2 rounded-2xl bg-[#140D33]/90 border-2 border-[#2E2266] shadow-[4px_4px_0px_#0B0720] text-right">
           <span className="block text-[11px] font-black uppercase tracking-widest text-[#FFE359]">
-            5 CABANG LOMBA
+            3 CABANG LOMBA AKADEMIK
           </span>
           <span className="block text-[10px] text-[#A99FD1] font-semibold mt-0.5">
             Akademik &amp; E-Sport

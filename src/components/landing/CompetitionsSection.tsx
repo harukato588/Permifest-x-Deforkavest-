@@ -65,10 +65,10 @@ const DEFAULT_COMPETITIONS: CompetitionDisplayItem[] = [
     categoryLabel: 'Akademik',
     iconBg: '#C4F15A',
     desc: 'Tulis gagasanmu soal keamanan siber dan ketahanan digital secara tajam dan solutif.',
-    formatText: 'Individu · Naskah PDF',
+    formatText: 'Individu / Tim (maks 2) · Naskah PDF',
     feeText: 'Rp 25.000',
     registrationFee: 25000,
-    participationType: 'Individu (1 orang)',
+    participationType: 'Individu / Tim (1–2 orang)',
     allowedFormat: 'Naskah Esai Ilmiah (.pdf, maks 15MB)',
   },
 ];
@@ -115,9 +115,11 @@ export function CompetitionsSection({
     return initialCompetitions.map((comp, idx) => {
       const isAcademic = comp.type === 'academic';
       const partTypeLabel =
-        comp.participation_type === 'individual'
-          ? 'Individu (1 orang)'
-          : `Tim (${comp.min_team_size || 1}–${comp.max_team_size || 3} orang)`;
+        comp.slug === 'esai' || comp.category === 'esai'
+          ? 'Individu / Tim (1–2 orang)'
+          : comp.participation_type === 'individual'
+            ? 'Individu (1 orang)'
+            : `Tim (${comp.min_team_size || 1}–${comp.max_team_size || 3} orang)`;
 
       const allowedFormatStr =
         comp.submission_config?.allowedTypes?.length
