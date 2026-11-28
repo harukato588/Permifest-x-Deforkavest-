@@ -3,7 +3,6 @@
 import { randomUUID } from 'node:crypto';
 import { revalidatePath } from 'next/cache';
 import { requirePermission, requireRole, requireUser } from '@/lib/auth/session';
-import { createClient as createServerSupabase } from '@/lib/supabase/server';
 import { ProfileSchema, type ProfileInput } from '@/features/auth/schema';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { isExtensionMimeMatching, sanitizeFilename } from '@/features/storage/schema';
@@ -314,8 +313,8 @@ export async function getKtmDownloadUrlAction(identityVerificationId: string) {
     return { success: false, error: 'Identitas berkas KTM tidak valid.' };
   }
 
-  const supabase = await createServerSupabase();
-  const { data: verification, error: verificationError } = await supabase
+  const admin = createAdminClient();
+  const { data: verification, error: verificationError } = await admin
     .from('identity_verifications')
     .select('storage_path')
     .eq('id', id.data)
@@ -325,7 +324,6 @@ export async function getKtmDownloadUrlAction(identityVerificationId: string) {
     return { success: false, error: 'KTM tidak ditemukan atau berada di luar cakupan akses kamu.' };
   }
 
-  const admin = createAdminClient();
   const { data, error } = await admin.storage
     .from('identity-docs')
     .createSignedUrl(verification.storage_path, 300, { download: true });
@@ -381,8 +379,9 @@ export async function reviewKtmAction(rawInput: unknown) {
   }
 
   const actor = await requirePermission('registrations.update');
-  const supabase = await createServerSupabase();
-  const { data: verification, error: verificationError } = await supabase
+  const admin = createAdminClient();
+
+  const { data: verification, error: verificationError } = await admin
     .from('identity_verifications')
     .select('id,user_id,status')
     .eq('id', parsed.data.identityVerificationId)
@@ -395,7 +394,7 @@ export async function reviewKtmAction(rawInput: unknown) {
     return { success: false, error: 'KTM ini sudah diperiksa. Muat ulang daftar peserta.' };
   }
 
-  const { data: registration, error: registrationError } = await supabase
+  const { data: registration, error: registrationError } = await admin
     .from('registrations')
     .select('id,competition_id')
     .eq('id', parsed.data.registrationId)
@@ -405,7 +404,6 @@ export async function reviewKtmAction(rawInput: unknown) {
     return { success: false, error: 'Pendaftaran tidak ditemukan atau berada di luar cakupan akses kamu.' };
   }
 
-  const admin = createAdminClient();
   const now = new Date().toISOString();
   const { data: updated, error: updateError } = await admin
     .from('identity_verifications')
