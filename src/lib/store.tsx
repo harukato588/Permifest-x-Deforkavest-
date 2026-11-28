@@ -41,11 +41,11 @@ const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
   event_name: 'Permifest x Deforkafest 2026',
   registration_open: true,
   maintenance_mode: false,
-  bank_name: 'BCA (Bank Central Asia)',
+  bank_name: 'BCA (Bank Central Asia) / QRIS Standar Nasional',
   bank_account_number: '8820 1928 37',
-  bank_account_holder: 'Panitia Permifest x Deforkafest',
-  qris_nmid: 'ID10293847561',
-  qris_image_url: '',
+  bank_account_holder: 'IMPS_INFORMATIKA',
+  qris_nmid: 'ID1026518731546',
+  qris_image_url: '/brand/qris.jpg',
   whatsapp_helpdesk: '0812-3456-7890',
   email_helpdesk: 'helpdesk@permifest.id',
   instagram_permikomnas: 'https://instagram.com/permikomnas.diy',
@@ -181,7 +181,15 @@ export function AppProvider({
   const [announcements, setAnnouncements] = useState<Announcement[]>(MOCK_ANNOUNCEMENTS);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(MOCK_AUDIT_LOGS);
   const [matchResults, setMatchResults] = useState<MatchResult[]>(MOCK_MATCH_RESULTS);
-  const [systemSettings, setSystemSettings] = useState<SystemSettings>(DEFAULT_SYSTEM_SETTINGS);
+  const [systemSettings, setSystemSettings] = useState<SystemSettings>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('permifest_system_settings');
+        if (saved) return { ...DEFAULT_SYSTEM_SETTINGS, ...JSON.parse(saved) };
+      } catch {}
+    }
+    return DEFAULT_SYSTEM_SETTINGS;
+  });
   const [scoreChanges, setScoreChanges] = useState<ScoreChange[]>([]);
   const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>(() => getTimelineEvents());
   const [partners, setPartners] = useState<Partner[]>(() => {
@@ -632,7 +640,13 @@ export function AppProvider({
 
   // --- Pengaturan Sistem ---
   const updateSystemSettings = async (updates: Partial<SystemSettings>) => {
-    setSystemSettings(prev => ({ ...prev, ...updates }));
+    setSystemSettings(prev => {
+      const next = { ...prev, ...updates };
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('permifest_system_settings', JSON.stringify(next));
+      }
+      return next;
+    });
     logAudit('UPDATE_SYSTEM_SETTINGS', 'system_settings', 'global', updates as Record<string, unknown>);
   };
 
