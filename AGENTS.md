@@ -57,6 +57,7 @@ Jika kode bertentangan dengan dokumen di atasnya, itu **bug atau dokumen perlu d
 8. **Peserta tidak pernah melihat nilai atau komentar juri.** Hanya hasil akhir yang sudah dirilis.
 9. **Jangan mengarang data publik**: statistik, testimoni, tanggal resmi, harga resmi, logo, tautan sosial. Pakai placeholder bertanda `[ISI]`.
 10. **Satu tugas = satu branch = satu PR kecil.** Perbarui dokumen terkait dan `CHANGELOG.md` di PR yang sama.
+11. **Selalu commit dan push ke branch `main`.** Vercel Production memantau `origin/main`; pastikan branch aktif adalah `main` sebelum commit dan push, dan jangan push ke `master` atau branch lain kecuali diminta eksplisit oleh pemilik proyek.
 
 ## 5. Perintah
 
@@ -121,3 +122,4 @@ npx supabase db reset   # terapkan migrasi + seed lokal
 - Membiarkan role-switcher demo aktif di production.
 - Menyimpan password atau menampilkannya; hanya reset.
 - Mengubah migrasi yang sudah diterapkan; membuat tabel di luar `docs/SCHEMA.md` tanpa ADR.
+- Melakukan commit atau push ke branch `master` maupun branch selain `main` tanpa instruksi eksplisit pemilik proyek.
