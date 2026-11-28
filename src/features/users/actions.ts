@@ -85,6 +85,9 @@ export async function updateProfileAction(rawInput: ProfileInput) {
     return { success: false, message: 'Profil tidak ditemukan. Muat ulang halaman lalu coba lagi.' };
   }
 
+  revalidatePath('/dashboard/peserta/profil');
+  revalidatePath('/dashboard/admin/peserta');
+
   return {
     success: true,
     message: 'Perubahan profil berhasil disimpan.',
@@ -183,17 +186,20 @@ export async function confirmKtmUploadAction(rawInput: unknown) {
     return { success: false, error: 'Ekstensi berkas tidak sesuai dengan tipe file.' };
   }
 
-  const supabase = await createServerSupabase();
-  const { data: profile, error: profileError } = await supabase
+  const admin = createAdminClient();
+  const { data: profile, error: profileError } = await admin
     .from('users')
     .select('education_level')
     .eq('id', user.id)
     .maybeSingle();
-  if (profileError || profile?.education_level !== 'mahasiswa') {
-    return { success: false, error: 'Status pendidikan mahasiswa diperlukan untuk mengunggah KTM.' };
+  if (profileError) {
+    return { success: false, error: 'Status pendidikan gagal diperiksa dari server. Coba muat ulang halaman.' };
+  }
+  if (profile?.education_level !== 'mahasiswa') {
+    return { success: false, error: 'Status pendidikan mahasiswa diperlukan untuk mengunggah KTM. Pastikan Anda sudah menyimpan status pendidikan sebagai Mahasiswa pada profil Anda.' };
   }
 
-  const { data: existing, error: existingError } = await supabase
+  const { data: existing, error: existingError } = await admin
     .from('identity_verifications')
     .select('id,status')
     .eq('user_id', user.id)
@@ -206,7 +212,6 @@ export async function confirmKtmUploadAction(rawInput: unknown) {
     return { success: false, error: 'KTM sudah dikirim dan tidak dapat diganti kecuali ditolak panitia.' };
   }
 
-  const admin = createAdminClient();
   const { data: file, error: fileError } = await admin.storage
     .from('identity-docs')
     .download(parsed.data.storagePath);
@@ -217,13 +222,15 @@ export async function confirmKtmUploadAction(rawInput: unknown) {
     return { success: false, error: 'Ukuran berkas yang diterima tidak sesuai. Unggah ulang KTM.' };
   }
 
-  const bytes = new Uint8Array(await file.slice(0, 12).arrayBuffer());
-  const isPdf = String.fromCharCode(...bytes.slice(0, 5)) === '%PDF-';
-  const isJpeg = bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
-  const isPng = [137, 80, 78, 71, 13, 10, 26, 10].every((value, index) => bytes[index] === value);
+  const headerSlice = new Uint8Array(await file.slice(0, 1024).arrayBuffer());
+  const headerText = new TextDecoder('latin1').decode(headerSlice);
+  const isPdf = headerText.includes('%PDF-');
+  const isJpeg = headerSlice.length >= 3 && headerSlice[0] === 0xff && headerSlice[1] === 0xd8 && headerSlice[2] === 0xff;
+  const isPng = headerSlice.length >= 8 && [137, 80, 78, 71, 13, 10, 26, 10].every((value, index) => headerSlice[index] === value);
   const isWebp =
-    String.fromCharCode(...bytes.slice(0, 4)) === 'RIFF' &&
-    String.fromCharCode(...bytes.slice(8, 12)) === 'WEBP';
+    headerSlice.length >= 12 &&
+    String.fromCharCode(...headerSlice.slice(0, 4)) === 'RIFF' &&
+    String.fromCharCode(...headerSlice.slice(8, 12)) === 'WEBP';
   const detectedMime = isPdf
     ? 'application/pdf'
     : isJpeg
@@ -238,7 +245,7 @@ export async function confirmKtmUploadAction(rawInput: unknown) {
     return { success: false, error: 'Isi berkas tidak cocok dengan format yang dipilih. Unggah ulang KTM.' };
   }
 
-  const { data: current, error: currentError } = await supabase
+  const { data: current, error: currentError } = await admin
     .from('identity_verifications')
     .select('id,status')
     .eq('user_id', user.id)
