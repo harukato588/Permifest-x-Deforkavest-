@@ -423,7 +423,7 @@ export const MOCK_FAQS: DynamicFaqItem[] = [
   {
     id: 'faq-1',
     question: 'Boleh mendaftar sendiri atau harus berkelompok?',
-    answer: 'Tergantung cabangnya. Cabang Esai Ilmiah dapat diikuti individu atau tim (maksimal 3 orang), UI/UX & IT Architecture tim 2-3 orang, sedangkan PES bertanding individu (1 vs 1) dan Mobile Legends bertim 5 pemain inti + 1 cadangan.',
+    answer: 'Tergantung cabangnya. Cabang Esai Ilmiah dapat diikuti individu atau tim (maksimal 2 orang), UI/UX bertanding individu (1 orang), IT Architecture tim 2-3 orang, sedangkan PES bertanding individu (1 vs 1) dan Mobile Legends bertim 5 pemain inti + 1 cadangan.',
     category: 'lomba',
     order_index: 1,
     is_published: true,

@@ -56,7 +56,7 @@ ON CONFLICT (id) DO UPDATE SET
 -- 3. Five Competitions (with Placeholder Markers in config)
 -- ----------------------------------------------------------------------------
 
--- 1. Esai (Akademik, Individu)
+-- 1. Esai (Akademik, Individu / Tim maks 2)
 INSERT INTO public.competitions (
   id, event_id, theme_id, slug, name, kind, participation,
   description, fee_idr, quota, team_min, team_max, reserve_max,
@@ -70,11 +70,11 @@ VALUES (
   'esai',
   'Kompetisi Esai Nasional',
   'academic',
-  'individual',
+  'team',
   'Kompetisi esai bertema inovasi dan ketahanan keamanan siber.',
   25000.00, -- [PLACEHOLDER]
   100,
-  1, 1, 0,
+  1, 2, 0,
   TRUE,
   '2026-11-01 00:00:00+00',
   '2026-12-15 23:59:59+00',
