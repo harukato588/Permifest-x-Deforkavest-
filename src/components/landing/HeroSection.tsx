@@ -63,14 +63,6 @@ export function HeroSection() {
               >
                 Daftar sekarang
               </SakugaButton>
-
-              <SakugaButton
-                href="#panduan"
-                variant="secondary"
-                size="lg"
-              >
-                Panduan pendaftaran
-              </SakugaButton>
             </div>
           </div>
 
@@ -122,7 +114,7 @@ export function HeroSection() {
                 width={640}
                 height={640}
                 loading="lazy"
-                
+
                 className="w-full h-auto max-h-[520px] lg:max-h-[580px] object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.6)] select-none pointer-events-none"
               />
             </div>
