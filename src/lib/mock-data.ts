@@ -423,7 +423,7 @@ export const MOCK_FAQS: DynamicFaqItem[] = [
   {
     id: 'faq-1',
     question: 'Boleh mendaftar sendiri atau harus berkelompok?',
-    answer: 'Tergantung cabangnya. Cabang Esai Ilmiah dapat diikuti individu atau tim (maksimal 2 orang), UI/UX bertanding individu (1 orang), IT Architecture tim 2-3 orang, sedangkan PES bertanding individu (1 vs 1) dan Mobile Legends bertim 5 pemain inti + 1 cadangan.',
+    answer: 'Tergantung cabangnya. Cabang Esai Ilmiah dapat diikuti individu atau tim (maksimal 2 orang), UI/UX bertanding individu (1 orang), dan IT System Architecture bertim 2-3 orang.',
     category: 'lomba',
     order_index: 1,
     is_published: true,
@@ -471,7 +471,7 @@ export const MOCK_FAQS: DynamicFaqItem[] = [
   {
     id: 'faq-7',
     question: 'Apakah semua peserta akan mendapatkan sertifikat?',
-    answer: 'Ya! Seluruh peserta yang menyelesaikan berkas karya atau hadir bertanding pada turnamen akan mendapatkan e-sertifikat nasional berpredikat resmi dari Permikomnas dan UST Yogyakarta.',
+    answer: 'Ya! Seluruh peserta yang menyelesaikan berkas karya pada cabang lomba akan mendapatkan e-sertifikat nasional berpredikat resmi dari Permikomnas dan UST Yogyakarta.',
     category: 'umum',
     order_index: 7,
     is_published: true,

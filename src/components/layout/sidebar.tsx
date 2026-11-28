@@ -15,7 +15,7 @@ import {
   Users,
   ClipboardText,
   FileText,
-  GameController,
+  // GameController,
   Bell,
   ClockCounterClockwise,
   SquaresFour,
@@ -110,7 +110,7 @@ export function Sidebar({ onCloseMobile }: SidebarProps) {
             items: [
               { label: 'Submission Karya', href: '/dashboard/admin/submission', icon: FileText },
               { label: 'Penilaian & Juri', href: '/dashboard/admin/penilaian', icon: CheckCircle },
-              { label: 'Hasil E-Sport', href: '/dashboard/admin/hasil', icon: GameController },
+              // { label: 'Hasil E-Sport', href: '/dashboard/admin/hasil', icon: GameController },
             ],
           },
           {

@@ -128,7 +128,7 @@ function PesertaKompetisiDetailContent() {
           </div>
         </Card>
 
-        {/* Informasi Tim (Khusus Perlombaan Beregu seperti Mobile Legends / IT Architecture) */}
+        {/* Informasi Tim (Khusus Perlombaan Beregu seperti IT Architecture / Esai Tim) */}
         {isTeam && (
           <Card className="border-[var(--border)] bg-[var(--card)]">
             <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-[var(--border)]">

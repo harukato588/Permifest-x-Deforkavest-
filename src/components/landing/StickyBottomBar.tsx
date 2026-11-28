@@ -41,7 +41,7 @@ export function StickyBottomBar() {
             </span>
           </div>
           <span className="block text-[11px] text-muted-foreground mt-0.5">
-            5 Cabang Kompetisi
+            3 Cabang Kompetisi Akademik
           </span>
         </div>
 

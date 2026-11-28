@@ -111,7 +111,7 @@ export default function PublicGuidebookPage() {
           </p>
         </div>
 
-        {/* ── Filter Kategori Tabs ── */}
+        {/* ── Filter Kategori Tabs (Hanya Cabang Akademik & Umum) ── */}
         <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-8 scrollbar-none select-none">
           <button
             type="button"
@@ -121,7 +121,7 @@ export default function PublicGuidebookPage() {
                 : 'bg-[#140D33] text-[#A99FD1] border-[#2E2266] hover:text-[#F5F2FF] hover:border-[#9B6BF2]'
               }`}
           >
-            Semua Dokumen ({publishedGuidebooks.length})
+            Semua Dokumen ({publishedGuidebooks.filter((g) => g.category !== 'pes' && g.category !== 'ml').length})
           </button>
           <button
             type="button"
@@ -162,26 +162,6 @@ export default function PublicGuidebookPage() {
               }`}
           >
             IT System Architecture
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveCategory('pes')}
-            className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all shrink-0 min-h-[40px] border ${activeCategory === 'pes'
-                ? 'bg-[#C4F15A] text-[#0B0720] border-[#C4F15A] shadow-[3px_3px_0px_#0B0720]'
-                : 'bg-[#140D33] text-[#A99FD1] border-[#2E2266] hover:text-[#F5F2FF] hover:border-[#C4F15A]'
-              }`}
-          >
-            PES 2026
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveCategory('ml')}
-            className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all shrink-0 min-h-[40px] border ${activeCategory === 'ml'
-                ? 'bg-[#FF9B70] text-[#0B0720] border-[#FF9B70] shadow-[3px_3px_0px_#0B0720]'
-                : 'bg-[#140D33] text-[#A99FD1] border-[#2E2266] hover:text-[#F5F2FF] hover:border-[#FF9B70]'
-              }`}
-          >
-            Mobile Legends
           </button>
         </div>
 

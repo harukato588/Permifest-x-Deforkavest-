@@ -84,7 +84,7 @@ export function HeroSection() {
               }}
             />
 
-            {/* ── Floating Badge 1: 5 Cabang Lomba (Kiri Atas) ── */}
+            {/* ── Floating Badge 1: 3 Cabang Lomba (Kiri Atas) ── */}
             <div className="absolute top-0 -left-2 sm:-left-6 z-20 px-3.5 py-2 rounded-2xl bg-[#140D33]/95 border-2 border-[#2E2266] shadow-[4px_4px_0px_#0B0720] flex items-center gap-3 transition-transform duration-200 hover:scale-105 select-none cursor-default">
               <div className="w-8 h-8 rounded-xl bg-[#9B6BF2]/20 border border-[#9B6BF2]/40 flex items-center justify-center text-[#9B6BF2] shrink-0">
                 <GameController size={20} weight="duotone" />
@@ -94,7 +94,7 @@ export function HeroSection() {
                   {compCount} Cabang Lomba
                 </span>
                 <span className="block text-[10px] text-[#6CC4FF] font-semibold mt-1">
-                  Akademik &amp; E-Sport
+                  Kompetisi Akademik
                 </span>
               </div>
             </div>
