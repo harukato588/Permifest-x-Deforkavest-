@@ -117,6 +117,41 @@ export async function submitWorkAction(raw: SubmitWorkInput): Promise<ActionResu
       };
     }
 
+    // 3b. Validasi integritas path berkas atau host tautan Figma
+    if (kind === 'file' && storage_path) {
+      const expectedPrefix = `${stage.competition_id}/${registration_id}/`;
+      if (storage_path.includes('..') || !storage_path.startsWith(expectedPrefix)) {
+        return {
+          success: false,
+          error: 'Path berkas karya tidak valid atau tidak sesuai dengan pendaftaran Anda.',
+        };
+      }
+    }
+
+    if (kind === 'link' && link_url) {
+      const { data: compInfo } = await admin
+        .from('competitions')
+        .select('slug, submission_config')
+        .eq('id', reg.competition_id)
+        .maybeSingle();
+
+      const linkType = (compInfo?.submission_config as { link_type?: string } | null)?.link_type;
+      if (compInfo?.slug === 'uiux' || linkType === 'figma') {
+        try {
+          const parsedUrl = new URL(link_url);
+          const host = parsedUrl.hostname.toLowerCase();
+          if (host !== 'figma.com' && !host.endsWith('.figma.com')) {
+            return {
+              success: false,
+              error: 'Tautan desain UI/UX wajib berasal dari domain figma.com.',
+            };
+          }
+        } catch {
+          return { success: false, error: 'Format tautan Figma tidak valid.' };
+        }
+      }
+    }
+
     // 4. Hitung versi pengumpulan (version = last_version + 1)
     const { data: latestSub } = await admin
       .from('submissions')

@@ -268,6 +268,12 @@ export async function submitPaymentProofAction(
 
     const { registration_id, proof_path } = parsed.data;
 
+    // Pastikan proof_path berasal dari direktori milik user & pendaftaran ini
+    const expectedPrefix = `${user.id}/${registration_id}/`;
+    if (proof_path.includes('..') || !proof_path.startsWith(expectedPrefix)) {
+      return { success: false, error: 'Path bukti pembayaran tidak valid.' };
+    }
+
     const supabase = await createServerSupabase();
 
     // Pastikan registrasi milik user ini

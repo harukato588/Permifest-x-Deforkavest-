@@ -8,7 +8,20 @@ export const SubmitWorkSchema = z.object({
   original_filename: z.string().max(255).optional(),
   mime: z.string().max(100).optional(),
   size_bytes: z.number().int().nonnegative().optional(),
-  link_url: z.string().url('Tautan URL harus berformat valid (https://...).').optional(),
+  link_url: z
+    .string()
+    .url('Tautan URL harus berformat valid (https://...).')
+    .refine(
+      (val) => {
+        try {
+          return new URL(val).protocol === 'https:';
+        } catch {
+          return false;
+        }
+      },
+      { message: 'Tautan karya wajib menggunakan protokol HTTPS yang aman.' }
+    )
+    .optional(),
   notes: z.string().max(1000, 'Catatan maksimal 1000 karakter.').optional(),
 }).refine(
   (data) => {

@@ -3,7 +3,7 @@
 import crypto from 'crypto';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient as createServerSupabase } from '@/lib/supabase/server';
-import { requireUser } from '@/lib/auth/session';
+import { requireUser, requirePermission } from '@/lib/auth/session';
 import {
   SignedUploadUrlSchema,
   SignedDownloadUrlSchema,
@@ -55,14 +55,49 @@ export async function getSignedUploadUrlAction(
       };
     }
 
-    // 2. Cek Autentikasi User dari Sesi Cookies
-    const supabase = await createServerSupabase();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    // 2. Wajib Autentikasi User & Cek Otorisasi Bucket / Kepemilikan Pendaftaran
+    const sessionUser = await requireUser();
+    const userId = sessionUser.id;
 
-    // Dalam mode produksi, user wajib login untuk mengunggah ke bucket privat
-    const userId = user?.id || 'demo-user-id';
+    if (bucket === 'public-assets') {
+      await requirePermission('competitions.write');
+    } else if (bucket === 'payment-proofs' || bucket === 'submissions') {
+      if (!registrationId) {
+        return {
+          success: false,
+          error: 'ID pendaftaran wajib disertakan untuk mengunggah berkas.',
+        };
+      }
+
+      const adminCheck = createAdminClient();
+      const { data: reg } = await adminCheck
+        .from('registrations')
+        .select('id, user_id, team_id')
+        .eq('id', registrationId)
+        .maybeSingle();
+
+      if (!reg) {
+        return { success: false, error: 'Pendaftaran tidak ditemukan.' };
+      }
+
+      let hasAccess = reg.user_id === userId;
+      if (!hasAccess && reg.team_id) {
+        const { data: member } = await adminCheck
+          .from('team_members')
+          .select('id')
+          .eq('team_id', reg.team_id)
+          .eq('user_id', userId)
+          .maybeSingle();
+        hasAccess = Boolean(member);
+      }
+
+      if (!hasAccess) {
+        return {
+          success: false,
+          error: 'Anda tidak memiliki izin untuk mengunggah berkas pada pendaftaran ini.',
+        };
+      }
+    }
 
     // 3. Susun Path Penyimpanan yang Bersih & Aman Berbasis UUID
     const cleanName = sanitizeFilename(filename);
@@ -267,6 +302,7 @@ export async function verifyAndConfirmUploadAction(
   }>
 > {
   try {
+    await requireUser();
     const parsed = ConfirmUploadSchema.safeParse(rawInput);
     if (!parsed.success) {
       return {
