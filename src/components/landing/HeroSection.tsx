@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { GameController, Trophy, MapPin } from '@phosphor-icons/react';
+import { GameController, MapPin } from '@phosphor-icons/react';
 import { SakugaButton } from '@/components/ui/sakuga-button';
 import { SakugaHeroBackground } from './SakugaHeroBackground';
 import { useAppStore } from '@/lib/store';
@@ -95,21 +95,6 @@ export function HeroSection() {
                 </span>
                 <span className="block text-[10px] text-[#6CC4FF] font-semibold mt-1">
                   Akademik &amp; E-Sport
-                </span>
-              </div>
-            </div>
-
-            {/* ── Floating Badge 2: Total Hadiah (Kanan Bawah) ── */}
-            <div className="absolute -bottom-3 -right-2 sm:-right-4 z-20 px-3.5 py-2 rounded-2xl bg-[#140D33]/95 border-2 border-[#2E2266] shadow-[4px_4px_0px_#0B0720] flex items-center gap-3 transition-transform duration-200 hover:scale-105 select-none cursor-default">
-              <div className="w-8 h-8 rounded-xl bg-[#FFE359]/20 border border-[#FFE359]/40 flex items-center justify-center text-[#FFE359] shrink-0">
-                <Trophy size={20} weight="duotone" />
-              </div>
-              <div className="text-left">
-                <span className="block text-xs font-black text-[#F5F2FF] uppercase tracking-wide leading-none">
-                  Hadiah Puluhan Juta
-                </span>
-                <span className="block text-[10px] text-[#FFE359] font-semibold mt-1">
-                  + Sertifikat Resmi
                 </span>
               </div>
             </div>

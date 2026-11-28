@@ -13,7 +13,7 @@ import {
 const FAST_LINKS = [
   { href: '/guidebook', label: 'Buku Panduan & Rulebook' },
   { href: '/#jadwal', label: 'Kalender & Alur Lomba' },
-  { href: '/#agenda', label: 'Seminar & Workshop' },
+  // { href: '/#agenda', label: 'Seminar & Workshop' },
   { href: '/#daftar', label: 'Alur & Panduan Pendaftaran' },
   { href: '/#faq', label: 'Pertanyaan Umum (FAQ)' },
   { href: '/login', label: 'Portal Masuk Peserta' },

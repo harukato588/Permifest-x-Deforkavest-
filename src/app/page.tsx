@@ -6,7 +6,7 @@ import { CountdownTimer } from '@/components/landing/CountdownTimer';
 import { PartnersSection } from '@/components/landing/PartnersSection';
 import { CompetitionsSection } from '@/components/landing/CompetitionsSection';
 import { TimelineSection } from '@/components/landing/TimelineSection';
-import { EventsSection } from '@/components/landing/EventsSection';
+// import { EventsSection } from '@/components/landing/EventsSection';
 import { LeaderboardTeaser } from '@/components/landing/LeaderboardTeaser';
 import { HowToRegisterSection } from '@/components/landing/HowToRegisterSection';
 import { FaqSection } from '@/components/landing/FaqSection';
@@ -44,7 +44,7 @@ export default function HomePage() {
           <CompetitionsDataSection />
         </Suspense>
         <TimelineSection id="jadwal" />
-        <EventsSection id="agenda" />
+        {/* <EventsSection id="agenda" /> */}
         <LeaderboardTeaser />
         <HowToRegisterSection id="daftar" />
         <FaqSection id="faq" />

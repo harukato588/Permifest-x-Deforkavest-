@@ -13,7 +13,7 @@ import {
   User,
 } from '@phosphor-icons/react';
 import { useAppStore } from '@/lib/store';
-import { TimelineEvent, TimelineEventType, EventItem } from '@/lib/types';
+import { TimelineEvent, TimelineEventType /* , EventItem */ } from '@/lib/types';
 import { createGoogleCalendarUrl, downloadIcsFile } from '@/lib/calendar';
 
 interface AgendaItem {
@@ -45,12 +45,14 @@ const EVENT_TYPE_MAP: Record<TimelineEventType, { stickerBg: string; badgeType: 
   pengumuman: { stickerBg: '#E6C978', badgeType: 'Pengumuman' },
 };
 
+/*
 const SEMINAR_TYPE_MAP: Record<string, { stickerBg: string; badgeType: string }> = {
   seminar: { stickerBg: '#9B6BF2', badgeType: 'Seminar Nasional' },
   webinar: { stickerBg: '#6CC4FF', badgeType: 'Webinar Online' },
   workshop: { stickerBg: '#C4F15A', badgeType: 'Tech Workshop' },
   ceremony: { stickerBg: '#FFE359', badgeType: 'Awarding Night' },
 };
+*/
 
 const MONTH_NAMES = [
   'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -68,8 +70,8 @@ export function TimelineSection({ id = 'jadwal' }: TimelineSectionProps) {
     () => (Array.isArray(rawTimelineEvents) ? rawTimelineEvents : []),
     [rawTimelineEvents]
   );
-  const rawEvents = store?.events;
-  const events = useMemo(() => (Array.isArray(rawEvents) ? rawEvents : []), [rawEvents]);
+  // const rawEvents = store?.events;
+  // const events = useMemo(() => (Array.isArray(rawEvents) ? rawEvents : []), [rawEvents]);
 
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
   const [activeMonth, setActiveMonth] = useState<11 | 12>(12);
@@ -122,7 +124,9 @@ export function TimelineSection({ id = 'jadwal' }: TimelineSectionProps) {
     });
   }, [timelineEvents]);
 
-  // Ubah events (seminar, webinar, workshop) ke AgendaItem
+  // Fitur seminar dikomen sementara
+  const seminarAgendaList: AgendaItem[] = useMemo(() => [], []);
+  /*
   const seminarAgendaList: AgendaItem[] = useMemo(() => {
     return events
       .filter((ev: EventItem) => ev.is_published)
@@ -159,6 +163,7 @@ export function TimelineSection({ id = 'jadwal' }: TimelineSectionProps) {
         };
       });
   }, [events]);
+  */
 
   // Gabungkan seluruh agenda sesuai filter kategori
   const unifiedAgendaList: AgendaItem[] = useMemo(() => {

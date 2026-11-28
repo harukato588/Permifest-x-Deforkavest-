@@ -406,7 +406,7 @@ export const MOCK_EVENTS: EventItem[] = [
     end_time: '2026-12-16T22:00:00+07:00',
     location_name: 'Hall Gedung Pusat Kebudayaan UST Yogyakarta',
     location_url: 'https://maps.google.com/?q=UST+Yogyakarta',
-    description: 'Malam penganugerahan trofi juara, pembagian prize pool puluhan juta rupiah, pameran karya inovasi teknologi mahasiswa, dan penampilan panggung seni budaya.',
+    description: 'Malam penganugerahan trofi juara, pameran karya inovasi teknologi mahasiswa, dan penampilan panggung seni budaya.',
     speakers: [],
     price: 0,
     quota: 400,

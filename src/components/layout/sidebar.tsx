@@ -30,7 +30,7 @@ import {
   Calendar,
   Handshake,
   BookOpen,
-  CalendarStar,
+  // CalendarStar,
 } from '@phosphor-icons/react';
 
 interface SidebarProps {
@@ -117,7 +117,7 @@ export function Sidebar({ onCloseMobile }: SidebarProps) {
             groupTitle: 'Konten & Publikasi',
             items: [
               { label: 'Timeline & Kalender', href: '/dashboard/admin/timeline', icon: Calendar },
-              { label: 'Agenda & Seminar', href: '/dashboard/admin/events', icon: CalendarStar },
+              // { label: 'Agenda & Seminar', href: '/dashboard/admin/events', icon: CalendarStar },
               { label: 'Pengumuman Resmi', href: '/dashboard/admin/pengumuman', icon: Bell },
               { label: 'Mitra & Sponsor', href: '/dashboard/admin/mitra', icon: Handshake },
               { label: 'Guidebook', href: '/dashboard/admin/guidebook', icon: BookOpen },

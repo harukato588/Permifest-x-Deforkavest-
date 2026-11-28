@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
 import { SakugaButton } from '@/components/ui/sakuga-button';
-import { CalendarBlank, Question, Trophy, BookOpen, CalendarStar } from '@phosphor-icons/react';
+import { CalendarBlank, Question, Trophy, BookOpen /* , CalendarStar */ } from '@phosphor-icons/react';
 
 interface NavLinkItem {
   href: string;
@@ -18,7 +18,7 @@ const NAV_LINKS: NavLinkItem[] = [
   { href: '/#lomba', section: 'lomba', label: 'Lomba', icon: Trophy },
   { href: '/guidebook', section: 'guidebook', label: 'Guidebook', icon: BookOpen },
   { href: '/#jadwal', section: 'jadwal', label: 'Jadwal & Alur', icon: CalendarBlank },
-  { href: '/#agenda', section: 'agenda', label: 'Agenda Seminar', icon: CalendarStar },
+  // { href: '/#agenda', section: 'agenda', label: 'Agenda Seminar', icon: CalendarStar },
   { href: '/#faq', section: 'faq', label: 'FAQ', icon: Question },
 ];
 
