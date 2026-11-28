@@ -135,7 +135,7 @@ export function Navbar({ activePage }: NavbarProps) {
         className="mobile-floating-nav fixed inset-x-3 z-50 mx-auto max-w-md rounded-full border border-border bg-background/75 p-2 shadow-md backdrop-blur-md md:hidden"
         aria-label="Navigasi bagian"
       >
-        <div className="grid grid-cols-5 gap-0">
+        <div className="grid grid-cols-4 gap-0">
           {NAV_LINKS.map((link) => {
             const Icon = link.icon;
             const isCurrentPage = activePage === link.section;
